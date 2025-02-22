@@ -29,14 +29,6 @@ load_dotenv()
 # Initialize OpenAI client
 client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 
-def is_evening_in_germany():
-    """Check if it's currently between 6:45 PM and 7:15 PM in Germany."""
-    germany_tz = pytz.timezone('Europe/Berlin')
-    current_time = datetime.now(germany_tz)
-    logging.info(f"Current time in Germany: {current_time}")
-    # Only run if it's between 6:45 PM and 7:15 PM in Germany
-    return 18.75 <= current_time.hour + (current_time.minute / 60) <= 19.25
-
 def extract_text_from_pdf(pdf_path):
     """Extract text from a PDF file."""
     logging.info("Extracting text from PDF: %s", pdf_path)
@@ -251,11 +243,6 @@ def main():
     """Main function to orchestrate the process."""
     logging.info("=== Starting Substitute Teacher Checker ===")
     logging.info("Running in environment: %s", "GitHub Actions" if os.getenv("GITHUB_ACTIONS") else "Local")
-    
-    if os.getenv("GITHUB_ACTIONS") == "true":
-        if not is_evening_in_germany():
-            logging.info("Not running - it's not evening in Germany right now")
-            return
     
     if not check_env_variables():
         return
