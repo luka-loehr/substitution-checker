@@ -1,503 +1,134 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Vertretungsplan Checker</title>
-    <link href="https://fonts.googleapis.com/css2?family=Helvetica+Neue:wght@400;700&display=swap" rel="stylesheet">
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
+        body { 
+            font-family: Arial, sans-serif; 
+            text-align: center; 
+            padding: 20px; 
+            background-color: #f5f5f5;
         }
-
-        body {
-            background: linear-gradient(135deg, #2a2a2a, #1c1c1c);
-            color: #e0e0e0;
-            font-family: 'Helvetica Neue', sans-serif;
-            overflow-x: hidden;
-            height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            position: relative;
-        }
-
-        /* Particle Background */
-        #particles {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            pointer-events: none;
-            z-index: 1;
-        }
-
         .container {
-            background: rgba(30, 30, 30, 0.9);
-            padding: 2rem;
-            border-radius: 15px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
-            max-width: 700px;
-            width: 90%;
-            position: relative;
-            z-index: 2;
-            animation: fadeIn 1s ease-out forwards;
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        h1 {
-            font-size: 2.5rem;
-            margin-bottom: 2rem;
-            color: #00d4ff;
-            text-align: center;
-            letter-spacing: 1px;
-        }
-
-        .button-container {
-            display: flex;
-            justify-content: center;
-            gap: 1.5rem;
-            margin-bottom: 2rem;
-        }
-
-        .trigger-btn {
-            background: linear-gradient(45deg, #00d4ff, #00ffaa);
-            border: none;
-            padding: 15px 30px;
-            border-radius: 30px;
-            color: #121212;
-            font-size: 1.2rem;
-            font-weight: 700;
-            cursor: pointer;
-            transition: transform 0.4s cubic-bezier(0.25, 0.1, 0.25, 1), box-shadow 0.4s cubic-bezier(0.25, 0.1, 0.25, 1);
-        }
-
-        .trigger-btn:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 5px 15px rgba(0, 212, 255, 0.4);
-        }
-
-        #log-window {
-            background: rgba(0, 0, 0, 0.3);
-            padding: 1rem;
+            max-width: 600px;
+            margin: 0 auto;
+            background-color: white;
             border-radius: 10px;
-            max-height: 0;
-            overflow: hidden;
-            transition: max-height 0.5s ease-in-out, opacity 0.5s ease;
-            opacity: 0;
-            margin-bottom: 1rem;
-            text-align: center;
+            padding: 20px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
         }
-
-        #log-window.active {
-            max-height: 100px;
-            opacity: 1;
-        }
-
-        .log-message {
-            font-size: 1rem;
-            color: #e0e0e0;
-            opacity: 0;
-            transform: translateY(-20px);
-            animation: slideIn 0.5s forwards;
-        }
-
-        .log-message.out {
-            animation: slideOut 0.5s forwards;
-        }
-
-        @keyframes slideIn {
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        @keyframes slideOut {
-            to { opacity: 0; transform: translateY(20px); }
-        }
-
-        .log-message.error {
-            color: #ff6b6b;
-        }
-
-        #result-div {
-            background: linear-gradient(135deg, #00d4ff, #00ffaa);
-            padding: 2rem;
-            border-radius: 15px;
-            opacity: 0;
-            transform: scale(0.95);
-            transition: opacity 0.8s cubic-bezier(0.4, 0, 0.2, 1), transform 0.8s cubic-bezier(0.4, 0, 0.2, 1);
-            text-align: center;
-            color: #121212;
-        }
-
-        #result-div.visible {
-            opacity: 1;
-            transform: scale(1);
-        }
-
-        #result-heading {
-            font-size: 2rem;
-            font-weight: 700;
-            margin-bottom: 1rem;
-        }
-
-        #result-text {
-            font-size: 1.4rem;
-            line-height: 1.6;
-        }
-
-        .settings-btn {
-            background: linear-gradient(45deg, #00d4ff, #00ffaa);
-            padding: 10px 20px;
-            border-radius: 30px;
-            color: #121212;
-            border: none;
+        h1 { color: #333; }
+        .trigger-btn { 
+            padding: 20px 40px; 
+            font-size: 20px; 
+            background-color: #2ea44f; 
+            color: white; 
+            border: none; 
+            border-radius: 8px;
             cursor: pointer;
-            transition: transform 0.4s cubic-bezier(0.25, 0.1, 0.25, 1), box-shadow 0.4s cubic-bezier(0.25, 0.1, 0.25, 1);
-            margin-top: 1rem;
+            margin: 20px 0;
+            width: 80%;
         }
-
-        .settings-btn:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 3px 10px rgba(0, 212, 255, 0.4);
+        .trigger-btn:active {
+            background-color: #22833c;
         }
-
-        #settings-panel {
-            background: rgba(30, 30, 30, 0.9);
-            padding: 1.5rem;
-            border-radius: 15px;
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
-            z-index: 3;
-            display: none;
-            animation: fadeIn 0.5s forwards;
-        }
-
-        .token-input {
-            width: 100%;
+        #result {
+            margin-top: 20px;
             padding: 10px;
-            margin: 10px 0;
             border-radius: 5px;
-            border: 1px solid #00d4ff;
-            background: #1e1e1e;
-            color: #e0e0e0;
         }
-
-        /* Smartphone Optimization */
-        @media (max-width: 600px) {
-            h1 {
-                font-size: 1.8rem;
-            }
-            .trigger-btn {
-                font-size: 1rem;
-                padding: 12px 24px;
-            }
-            .container {
-                width: 95%;
-                padding: 1.5rem;
-            }
-            .button-container {
-                flex-direction: column;
-                gap: 1rem;
-            }
-            .trigger-btn {
-                width: 100%;
-            }
-            #log-window {
-                font-size: 0.9rem;
-            }
-            #result-heading {
-                font-size: 1.5rem;
-            }
-            #result-text {
-                font-size: 1.2rem;
-            }
-        }
+        .success { background-color: #d4edda; color: #155724; }
+        .error { background-color: #f8d7da; color: #721c24; }
+        .pending { background-color: #fff3cd; color: #856404; }
     </style>
 </head>
 <body>
-    <canvas id="particles"></canvas>
     <div class="container">
         <h1>Vertretungsplan Checker</h1>
-        <div class="button-container">
-            <button class="trigger-btn" onclick="triggerWorkflow('email')">Send via Email</button>
-            <button class="trigger-btn" onclick="triggerWorkflow('check_now')">Check Now</button>
-        </div>
-        <div id="log-window"></div>
-        <div id="result-div" style="display: none;">
-            <h2 id="result-heading"></h2>
-            <p id="result-text"></p>
-        </div>
-        <button class="settings-btn" onclick="toggleSettings()">Settings</button>
-        <div id="settings-panel">
-            <p>Enter your GitHub Token:</p>
+        
+        <div id="settings-panel" style="display: none;">
+            <p>Enter your GitHub token (stored locally on your device only):</p>
             <input type="password" id="token-input" class="token-input" placeholder="GitHub Personal Access Token" />
             <button onclick="saveToken()" class="settings-btn">Save Token</button>
         </div>
+        
+        <button class="trigger-btn" onclick="triggerWorkflow()">Check Now</button>
+        <p id="result">Ready to check for substitutions</p>
+        <button onclick="toggleSettings()" class="settings-btn">Settings</button>
     </div>
 
     <script>
-        // Particle Background
-        const canvas = document.getElementById('particles');
-        const ctx = canvas.getContext('2d');
-        canvas.width = window.innerWidth;
-        canvas.height = window.innerHeight;
-
-        const particlesArray = [];
-        class Particle {
-            constructor() {
-                this.x = Math.random() * canvas.width;
-                this.y = Math.random() * canvas.height;
-                this.size = Math.random() * 5 + 1;
-                this.speedX = Math.random() * 0.5 - 0.25;
-                this.speedY = Math.random() * 0.5 - 0.25;
+    // GitHub repository information
+    const GITHUB_USERNAME = "luka-loehr";  // Replace with your GitHub username
+    const REPO_NAME = "substitution-checker"; // Your repository name
+    const BRANCH_NAME = "main";
+    
+    function toggleSettings() {
+        const settingsPanel = document.getElementById('settings-panel');
+        if (settingsPanel.style.display === 'none') {
+            settingsPanel.style.display = 'block';
+            const storedToken = localStorage.getItem('github_token');
+            if (storedToken) {
+                document.getElementById('token-input').value = storedToken;
             }
-            update() {
-                this.x += this.speedX;
-                this.y += this.speedY;
-                if (this.size > 0.1) this.size -= 0.005;
-            }
-            draw() {
-                ctx.fillStyle = 'rgba(0, 212, 255, 0.5)';
-                ctx.beginPath();
-                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
-                ctx.fill();
-            }
+        } else {
+            settingsPanel.style.display = 'none';
         }
-
-        function initParticles() {
-            for (let i = 0; i < 100; i++) {
-                particlesArray.push(new Particle());
-            }
+    }
+    
+    function saveToken() {
+        const token = document.getElementById('token-input').value.trim();
+        if (token) {
+            localStorage.setItem('github_token', token);
+            document.getElementById('result').textContent = "Token saved";
+            document.getElementById('settings-panel').style.display = 'none';
+        } else {
+            document.getElementById('result').textContent = "Token cannot be empty";
+            document.getElementById('result').className = "error";
         }
+    }
 
-        function animateParticles() {
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-            particlesArray.forEach((particle, index) => {
-                particle.update();
-                particle.draw();
-                if (particle.size <= 0.1) {
-                    particlesArray.splice(index, 1);
-                    particlesArray.push(new Particle());
-                }
-            });
-            requestAnimationFrame(animateParticles);
+    function triggerWorkflow() {
+        const resultElement = document.getElementById('result');
+        
+        const token = localStorage.getItem('github_token');
+        
+        if (!token) {
+            resultElement.textContent = "Please set your GitHub token in Settings first";
+            resultElement.className = "error";
+            toggleSettings();
+            return;
         }
-
-        initParticles();
-        animateParticles();
-
-        // Fake Logs for Faster Perceived Performance
-        const fakeLogs = [
-            "Initializing analysis...",
-            "Connecting to server...",
-            "Processing data...",
-            "Analyzing with AI...",
-            "Generating report..."
-        ];
-
-        let fakeLogIndex = 0;
-        let logInterval;
-
-        function showFakeLog() {
-            const logWindow = document.getElementById('log-window');
-            logWindow.innerHTML = `<p class="log-message">${fakeLogs[fakeLogIndex]}</p>`;
-            fakeLogIndex = (fakeLogIndex + 1) % fakeLogs.length;
-        }
-
-        function startFakeLogs() {
-            logInterval = setInterval(showFakeLog, 2000);
-        }
-
-        function stopFakeLogs() {
-            clearInterval(logInterval);
-        }
-
-        // JavaScript Logic
-        function toggleSettings() {
-            const panel = document.getElementById('settings-panel');
-            panel.style.display = panel.style.display === 'none' ? 'block' : 'none';
-        }
-
-        function saveToken() {
-            const token = document.getElementById('token-input').value.trim();
-            if (token) {
-                localStorage.setItem('github_token', token);
-                alert('Token saved successfully');
-                toggleSettings();
+        
+        resultElement.textContent = "Triggering workflow...";
+        resultElement.className = "pending";
+        
+        fetch(`https://api.github.com/repos/${GITHUB_USERNAME}/${REPO_NAME}/actions/workflows/check-substitutions.yml/dispatches`, {
+            method: 'POST',
+            headers: {
+                'Authorization': `token ${token}`,
+                'Accept': 'application/vnd.github.v3+json',
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                ref: BRANCH_NAME
+            })
+        })
+        .then(response => {
+            if (response.status === 204) {
+                resultElement.textContent = "Success! Workflow triggered. Check your email in a few minutes.";
+                resultElement.className = "success";
             } else {
-                alert('Please enter a valid token');
+                resultElement.textContent = `Error: Status code ${response.status}`;
+                resultElement.className = "error";
             }
-        }
-
-        function triggerWorkflow(mode) {
-            const token = localStorage.getItem('github_token');
-            if (!token) {
-                alert('Please set your GitHub token in Settings');
-                toggleSettings();
-                return;
-            }
-
-            fetch('https://api.github.com/repos/luka-loehr/substitution-checker/actions/workflows/check-substitutions.yml/dispatches', {
-                method: 'POST',
-                headers: {
-                    'Authorization': `token ${token}`,
-                    'Accept': 'application/vnd.github.v3+json',
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({
-                    ref: 'main',
-                    inputs: { mode: mode }
-                })
-            }).then(response => {
-                if (response.status === 204) {
-                    if (mode === 'email') {
-                        alert('Workflow triggered. Check your email soon.');
-                    } else if (mode === 'check_now') {
-                        startFakeLogs();
-                        setTimeout(() => getLatestRunId().then(pollRun), 1000);
-                    }
-                } else {
-                    alert('Error triggering workflow');
-                }
-            }).catch(error => alert('Error: ' + error.message));
-        }
-
-        async function getLatestRunId() {
-            const token = localStorage.getItem('github_token');
-            const response = await fetch('https://api.github.com/repos/luka-loehr/substitution-checker/actions/workflows/check-substitutions.yml/runs?per_page=1', {
-                headers: {
-                    'Authorization': `token ${token}`,
-                    'Accept': 'application/vnd.github.v3+json'
-                }
-            });
-            const data = await response.json();
-            return data.workflow_runs[0].id;
-        }
-
-        function pollRun(runId) {
-            const logWindow = document.getElementById('log-window');
-            logWindow.classList.add('active');
-
-            const interval = setInterval(async () => {
-                const runDetails = await fetchRunDetails(runId);
-                if (runDetails.status === 'completed') {
-                    clearInterval(interval);
-                    stopFakeLogs();
-                    const logs = await fetchLogs(runId);
-                    const result = extractResult(logs);
-                    if (result) showResult(result);
-                    else showError('Analysis failed to produce a result');
-                } else {
-                    const logs = await fetchLogs(runId);
-                    updateLogWindow(logs);
-                }
-            }, 2000); // Poll every 2 seconds
-        }
-
-        async function fetchRunDetails(runId) {
-            const token = localStorage.getItem('github_token');
-            const response = await fetch(`https://api.github.com/repos/luka-loehr/substitution-checker/actions/runs/${runId}`, {
-                headers: {
-                    'Authorization': `token ${token}`,
-                    'Accept': 'application/vnd.github.v3+json'
-                }
-            });
-            return response.json();
-        }
-
-        async function fetchLogs(runId) {
-            const token = localStorage.getItem('github_token');
-            const jobsResponse = await fetch(`https://api.github.com/repos/luka-loehr/substitution-checker/actions/runs/${runId}/jobs`, {
-                headers: {
-                    'Authorization': `token ${token}`,
-                    'Accept': 'application/vnd.github.v3+json'
-                }
-            });
-            const jobsData = await jobsResponse.json();
-            const jobId = jobsData.jobs[0].id;
-            const logsResponse = await fetch(`https://api.github.com/repos/luka-loehr/substitution-checker/actions/jobs/${jobId}/logs`, {
-                headers: {
-                    'Authorization': `token ${token}`,
-                    'Accept': 'application/vnd.github.v3+json'
-                }
-            });
-            return logsResponse.text();
-        }
-
-        function updateLogWindow(logs) {
-            const lines = logs.split('\n');
-            const messages = lines
-                .map(line => {
-                    const parts = line.split(' - ');
-                    if (parts.length >= 3) {
-                        const message = parts[2];
-                        if (message.startsWith('PROGRESS: ')) {
-                            return { type: 'progress', text: message.replace('PROGRESS: ', '') };
-                        } else if (message.startsWith('ERROR: ')) {
-                            return { type: 'error', text: message.replace('ERROR: ', '') };
-                        }
-                    }
-                    return null;
-                })
-                .filter(msg => msg);
-
-            if (messages.length > 0) {
-                const latestMessage = messages[messages.length - 1];
-                const logWindow = document.getElementById('log-window');
-                logWindow.innerHTML = `<p class="log-message ${latestMessage.type}">${latestMessage.text}</p>`;
-            }
-        }
-
-        function extractResult(logs) {
-            const lines = logs.split('\n');
-            for (const line of lines) {
-                const parts = line.split(' - ');
-                if (parts.length >= 3 && parts[2].startsWith('ANALYSIS_RESULT: ')) {
-                    return parts[2].replace('ANALYSIS_RESULT: ', '');
-                }
-            }
-            return null;
-        }
-
-        function showResult(result) {
-            stopFakeLogs();
-            const logWindow = document.getElementById('log-window');
-            logWindow.classList.remove('active');
-            const resultDiv = document.getElementById('result-div');
-            resultDiv.style.display = 'block';
-            setTimeout(() => resultDiv.classList.add('visible'), 10);
-
-            const match = result.match(/Für (\w+)/);
-            if (match) {
-                const day = match[1];
-                document.getElementById('result-heading').textContent = `Vertretungen für ${day}`;
-                document.getElementById('result-text').textContent = result.replace(/Für \w+ /, '');
-            } else {
-                document.getElementById('result-heading').textContent = 'Analysis Result';
-                document.getElementById('result-text').textContent = result;
-            }
-        }
-
-        function showError(message) {
-            stopFakeLogs();
-            const logWindow = document.getElementById('log-window');
-            logWindow.classList.remove('active');
-            const resultDiv = document.getElementById('result-div');
-            resultDiv.style.display = 'block';
-            setTimeout(() => resultDiv.classList.add('visible'), 10);
-            document.getElementById('result-heading').textContent = 'Error';
-            document.getElementById('result-text').textContent = message;
-        }
+        })
+        .catch(error => {
+            resultElement.textContent = `Error: ${error.message}`;
+            resultElement.className = "error";
+        });
+    }
     </script>
 </body>
 </html>
