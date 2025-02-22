@@ -1,289 +1,448 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Vertretungsplan Checker</title>
-  <style>
-    /* Global Styles */
-    body {
-      font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
-      text-align: center;
-      padding: 20px;
-      background-color: #f5f5f5;
-      margin: 0;
-    }
-    .container {
-      max-width: 600px;
-      margin: 30px auto;
-      background-color: #fff;
-      border-radius: 10px;
-      padding: 20px;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-    }
-    h1 {
-      color: #333;
-      margin-bottom: 10px;
-    }
-    /* Button Styles */
-    .button-group {
-      display: flex;
-      flex-direction: column;
-      gap: 15px;
-      margin: 20px 0;
-    }
-    .trigger-btn {
-      padding: 18px 0;
-      font-size: 18px;
-      background-color: #2ea44f;
-      color: #fff;
-      border: none;
-      border-radius: 8px;
-      cursor: pointer;
-      width: 90%;
-      margin: 0 auto;
-      transition: background-color 0.2s ease, transform 0.2s ease;
-    }
-    .trigger-btn:hover {
-      background-color: #24933d;
-      transform: scale(1.02);
-    }
-    .trigger-btn:active {
-      background-color: #1e7a32;
-    }
-    .settings-btn {
-      font-size: 14px;
-      background-color: #6c757d;
-      padding: 8px 16px;
-      color: #fff;
-      border: none;
-      border-radius: 4px;
-      cursor: pointer;
-      margin-top: 10px;
-    }
-    /* Settings Panel */
-    #settings-panel {
-      display: none;
-      margin: 15px 0;
-      padding: 10px;
-      background-color: #eef;
-      border-radius: 6px;
-    }
-    .token-input {
-      width: 80%;
-      padding: 10px;
-      margin: 10px 0;
-      border: 1px solid #ccc;
-      border-radius: 4px;
-    }
-    /* Log Window */
-    .log-window {
-      background-color: #222;
-      color: #eee;
-      padding: 15px;
-      border-radius: 5px;
-      margin-top: 20px;
-      max-height: 200px;
-      overflow-y: auto;
-      text-align: left;
-      transition: opacity 0.5s ease, max-height 0.5s ease;
-    }
-    .log-window.hidden {
-      opacity: 0;
-      max-height: 0;
-      padding: 0 15px;
-      margin-top: 0;
-    }
-    .log-message {
-      margin: 5px 0;
-      font-size: 14px;
-      animation: fadeIn 0.5s ease-in;
-    }
-    @keyframes fadeIn {
-      from { opacity: 0; }
-      to { opacity: 1; }
-    }
-    /* Result Window */
-    .result-window {
-      background-color: #e0ffe0;
-      color: #333;
-      padding: 20px;
-      border-radius: 5px;
-      margin-top: 20px;
-      transition: transform 0.5s ease, opacity 0.5s ease;
-    }
-    .result-window.hidden {
-      opacity: 0;
-      transform: scale(0.95);
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vertretungsplan Checker</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Roboto', Arial, sans-serif;
+            background-color: #f4f4f4;
+            color: #333;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            text-align: center;
+        }
+
+        .container {
+            background-color: #fff;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            padding: 25px;
+            width: 90%;
+            max-width: 500px; /* Adjusted for better mobile view */
+            transition: transform 0.3s ease;
+            overflow: hidden; /* Ensure internal content doesn't overflow */
+        }
+      .container.shake {
+        animation: shake 0.82s cubic-bezier(.36,.07,.19,.97) both;
+      }
+
+
+        h1 {
+            color: #4a4a4a;
+            margin-bottom: 20px;
+            font-weight: 500;
+        }
+
+        .button {
+            background-color: #4CAF50;
+            color: white;
+            padding: 15px 25px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background-color 0.3s ease, transform 0.2s ease;
+            margin: 10px 0;
+            width: 100%; /* Full width for smaller screens */
+            display: inline-block; /* Allows width to work correctly */
+            box-sizing: border-box; /* Include padding in width */
+        }
+
+        .button:hover {
+            background-color: #367c39;
+            transform: translateY(-2px);
+        }
+
+        .button:active {
+            transform: translateY(1px);
+        }
+
+        .button-secondary {
+            background-color: #6c757d;
+        }
+
+        .button-secondary:hover {
+            background-color: #5a6268;
+        }
+
+        #settings-panel {
+            display: none; /* Hidden by default */
+            padding: 15px;
+            border-top: 1px solid #eee;
+            margin-top: 20px;
+        }
+
+        .token-input {
+            width: calc(100% - 22px); /* Full width, accounting for padding */
+            padding: 10px;
+            margin-bottom: 10px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            box-sizing: border-box;
+        }
+
+        #log-window {
+            background-color: #f9f9f9;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            padding: 10px;
+            margin-top: 20px;
+            text-align: left;
+            max-height: 200px;  /* Limit height, scroll if needed */
+            overflow-y: auto;  /* Enable vertical scrolling */
+            font-size: 0.9em;
+            line-height: 1.4;
+            display: none; /* Hidden initially */
+        }
+
+        #log-window p {
+            margin: 5px 0;
+            padding: 0;
+        }
+        #result-window{
+            display: none;
+            margin-top: 20px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            padding: 10px;
+        }
+
+        /* Status Messages */
+        .status-message {
+            margin-top: 15px;
+            padding: 10px;
+            border-radius: 6px;
+            font-weight: 500;
+        }
+
+        .success {
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .error {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        .pending {
+            background-color: #fff3cd;
+            color: #856404;
+            border: 1px solid #ffeeba;
+        }
+
+        .hidden {
+            display: none;
+        }
+        @keyframes shake {
+          10%, 90% {
+            transform: translate3d(-1px, 0, 0);
+          }
+          
+          20%, 80% {
+            transform: translate3d(2px, 0, 0);
+          }
+
+          30%, 50%, 70% {
+            transform: translate3d(-4px, 0, 0);
+          }
+
+          40%, 60% {
+            transform: translate3d(4px, 0, 0);
+          }
+        }
+
+        .fade-in {
+            animation: fadeIn 0.5s ease forwards;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        .log-entry {
+          margin-bottom: 0.2em;
+        }
+        .log-entry.highlight {
+          font-weight: bold;
+          color: #4CAF50; /* Or any color you find suitable */
+        }
+        .log-window.minimized {
+          max-height: 30px; /* Adjust as needed */
+          overflow: hidden;
+        }
+
+    </style>
 </head>
 <body>
-  <div class="container">
-    <h1>Vertretungsplan Checker</h1>
-    
-    <!-- Settings Panel -->
-    <div id="settings-panel">
-      <p>Enter your GitHub token (stored locally on your device only):</p>
-      <input type="password" id="token-input" class="token-input" placeholder="GitHub Personal Access Token" />
-      <button onclick="saveToken()" class="settings-btn">Save Token</button>
+    <div class="container" id="main-container">
+        <h1>Vertretungsplan Checker</h1>
+
+        <button id="check-now-button" class="button" onclick="checkNow()">Check Now!</button>
+        <button id="send-email-button" class="button button-secondary" onclick="triggerWorkflow('email')">Send via Email</button>
+
+
+        <div id="settings-panel">
+            <p>Enter your GitHub token (stored locally on your device only):</p>
+            <input type="password" id="token-input" class="token-input" placeholder="GitHub Personal Access Token" />
+            <button onclick="saveToken()" class="button button-secondary">Save Token</button>
+        </div>
+
+        <p id="status-message" class="status-message pending">Ready to check for substitutions</p>
+
+        <button onclick="toggleSettings()" class="button button-secondary">Settings</button>
+
+        <div id="log-window"></div>
+        <div id="result-window"></div>
     </div>
-    
-    <!-- Buttons -->
-    <div class="button-group">
-      <button id="sendEmailBtn" class="trigger-btn">Send via Email</button>
-      <button id="checkNowBtn" class="trigger-btn">Check Now!</button>
-    </div>
-    
-    <!-- Log Window -->
-    <div id="logWindow" class="log-window hidden">
-      <div id="logContent"></div>
-    </div>
-    
-    <!-- Result Window -->
-    <div id="resultWindow" class="result-window hidden">
-      <h2 id="resultHeading"></h2>
-      <p id="resultText"></p>
-    </div>
-    
-    <button onclick="toggleSettings()" class="settings-btn">Settings</button>
-  </div>
-  
-  <script>
-    // GitHub repository information
-    const GITHUB_USERNAME = "luka-loehr"; 
-    const REPO_NAME = "substitution-checker";
-    const BRANCH_NAME = "main";
-    
-    /* Settings Panel Functions */
-    function toggleSettings() {
-      const settingsPanel = document.getElementById('settings-panel');
-      if (settingsPanel.style.display === 'none' || settingsPanel.style.display === '') {
-        settingsPanel.style.display = 'block';
-        const storedToken = localStorage.getItem('github_token');
-        if (storedToken) {
-          document.getElementById('token-input').value = storedToken;
+
+    <script>
+        const GITHUB_USERNAME = "luka-loehr";
+        const REPO_NAME = "substitution-checker";
+        const BRANCH_NAME = "main";
+        let workflowRunning = false;
+        let logUpdateInterval;
+
+        function toggleSettings() {
+            const settingsPanel = document.getElementById('settings-panel');
+            settingsPanel.style.display = settingsPanel.style.display === 'none' ? 'block' : 'none';
+            // Pre-fill with stored token
+            const storedToken = localStorage.getItem('github_token');
+            if (storedToken && settingsPanel.style.display === 'block') {
+                document.getElementById('token-input').value = storedToken;
+            }
         }
-      } else {
-        settingsPanel.style.display = 'none';
-      }
-    }
-    
-    function saveToken() {
-      const token = document.getElementById('token-input').value.trim();
-      if (token) {
-        localStorage.setItem('github_token', token);
-        updateLog("Token saved.");
-        document.getElementById('settings-panel').style.display = 'none';
-      } else {
-        updateLog("Token cannot be empty.");
-      }
-    }
-    
-    /* Logging and UI Update Functions */
-    function updateLog(message) {
-      const logContent = document.getElementById('logContent');
-      const p = document.createElement("p");
-      p.textContent = message;
-      p.className = "log-message";
-      logContent.appendChild(p);
-      logContent.scrollTop = logContent.scrollHeight;
-    }
-    
-    function showError(message) {
-      alert(message);
-    }
-    
-    /* Workflow Functions */
-    function sendEmail() {
-      const token = localStorage.getItem('github_token');
-      if (!token) {
-        showError("Please set your GitHub token in Settings first");
-        toggleSettings();
-        return;
-      }
-      // Clear any previous log and hide result window
-      document.getElementById('logContent').innerHTML = "";
-      document.getElementById('logWindow').classList.remove("hidden");
-      document.getElementById('resultWindow').classList.add("hidden");
-      
-      updateLog("Triggering workflow for email...");
-      
-      fetch(`https://api.github.com/repos/${GITHUB_USERNAME}/${REPO_NAME}/actions/workflows/check-substitutions.yml/dispatches`, {
-        method: 'POST',
-        headers: {
-          'Authorization': `token ${token}`,
-          'Accept': 'application/vnd.github.v3+json',
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({ ref: BRANCH_NAME })
-      })
-      .then(response => {
-        if (response.status === 204) {
-          updateLog("Success! Workflow triggered. Check your email in a few minutes.");
-        } else {
-          updateLog(`Error: Status code ${response.status}`);
+        function minimizeLogWindow() {
+          const logWindow = document.getElementById('log-window');
+          logWindow.classList.add('minimized');
         }
-      })
-      .catch(error => {
-        updateLog(`Error: ${error.message}`);
-      });
-    }
-    
-    function checkNow() {
-      const token = localStorage.getItem('github_token');
-      if (!token) {
-        showError("Please set your GitHub token in Settings first");
-        toggleSettings();
-        return;
+
+        function saveToken() {
+            const token = document.getElementById('token-input').value.trim();
+            if (token) {
+                localStorage.setItem('github_token', token);
+                updateStatus("Token saved", "success");
+                document.getElementById('settings-panel').style.display = 'none';
+            } else {
+                updateStatus("Token cannot be empty", "error");
+            }
+        }
+      function updateStatus(message, type) {
+          const statusElement = document.getElementById('status-message');
+          statusElement.textContent = message;
+          statusElement.className = `status-message ${type}`; // Use template literals for clarity
+          statusElement.classList.add('fade-in'); // Apply fade-in animation
+          setTimeout(() => statusElement.classList.remove('fade-in'), 500); // Remove after animation
       }
-      // Reset log and hide result window
-      document.getElementById('logContent').innerHTML = "";
-      document.getElementById('logWindow').classList.remove("hidden");
-      document.getElementById('resultWindow').classList.add("hidden");
-      
-      // Simulate a sequence of workflow steps
-      const steps = [
-        "Workflow request sent.",
-        "Please wait until the workflow starts...",
-        "Downloading PDF...",
-        "Extracting text...",
-        "Sending to OpenAI API...",
-        "Processing result..."
-      ];
-      let stepIndex = 0;
-      function nextStep() {
-        if (stepIndex < steps.length) {
-          updateLog(steps[stepIndex]);
-          stepIndex++;
-          setTimeout(nextStep, 2000); // 2-second delay between steps
-        } else {
-          finalizeResult();
+
+      function addLogEntry(message, highlight = false) {
+          const logWindow = document.getElementById('log-window');
+          const logEntry = document.createElement('p');
+          logEntry.textContent = message;
+          logEntry.classList.add('log-entry');
+          if (highlight) {
+              logEntry.classList.add('highlight');
+          }
+          logWindow.appendChild(logEntry);
+          logWindow.scrollTop = logWindow.scrollHeight; // Auto-scroll to bottom
+          logWindow.style.display = 'block'; // Ensure log window is visible
+      }
+
+        function triggerWorkflow(mode) {
+          const container = document.getElementById('main-container');
+            const token = localStorage.getItem('github_token');
+            if (!token) {
+                updateStatus("Please set your GitHub token in Settings", "error");
+                toggleSettings();
+              container.classList.add('shake');
+              setTimeout(() => container.classList.remove('shake'), 820);
+                return;
+            }
+
+            if (workflowRunning) {
+              updateStatus("Workflow already running. Please wait.", "pending");
+              container.classList.add('shake');
+              setTimeout(() => container.classList.remove('shake'), 820);
+              return;
+            }
+          let url = '';
+          if(mode == 'email'){
+              url = `https://api.github.com/repos/${GITHUB_USERNAME}/${REPO_NAME}/actions/workflows/check-substitutions.yml/dispatches`;
+          }
+          else{
+            url = `https://api.github.com/repos/${GITHUB_USERNAME}/${REPO_NAME}/actions/workflows/check-now.yml/dispatches`;
+          }
+
+
+            workflowRunning = true; // Set flag to prevent concurrent runs
+
+            updateStatus("Workflow request sent. Please wait...", "pending");
+            addLogEntry("Sending workflow request...");
+
+          if(mode == 'email'){
+            fetch(url, {
+                method: 'POST',
+                headers: {
+                    'Authorization': `token ${token}`,
+                    'Accept': 'application/vnd.github.v3+json',
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    ref: BRANCH_NAME
+                })
+            })
+            .then(response => {
+                workflowRunning = false; // Reset flag on response
+                if (response.status === 204) {
+                    updateStatus("Success! Workflow triggered. Check your email in a few minutes.", "success");
+                } else {
+                  updateStatus(`Error: Status code ${response.status}`, "error");
+                  container.classList.add('shake');
+                  setTimeout(() => container.classList.remove('shake'), 820);
+                }
+            })
+            .catch(error => {
+                workflowRunning = false; // Reset flag on error
+              updateStatus(`Error: ${error.message}`, "error");
+              container.classList.add('shake');
+              setTimeout(() => container.classList.remove('shake'), 820);
+
+            });
+        }
+        else{
+            fetch(url, {
+                method: 'POST',
+                headers: {
+                    'Authorization': `token ${token}`,
+                    'Accept': 'application/vnd.github.v3+json',
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    ref: BRANCH_NAME
+                })
+            })
+            .then(response => {
+              if (response.status === 204) {
+                    updateStatus("Workflow started. Please wait...", "pending");
+                    addLogEntry("Workflow triggered. Downloading PDF...");
+                    // Start polling for logs
+                    logUpdateInterval = setInterval(fetchWorkflowLogs, 5000); // Poll every 5 seconds
+                } else {
+                  workflowRunning = false;
+                  updateStatus(`Error: Status code ${response.status}`, "error");
+                  container.classList.add('shake');
+                  setTimeout(() => container.classList.remove('shake'), 820);
+                }
+            })
+            .catch(error => {
+                workflowRunning = false;
+                updateStatus(`Error: ${error.message}`, "error");
+              container.classList.add('shake');
+              setTimeout(() => container.classList.remove('shake'), 820);
+            });
         }
       }
-      nextStep();
+
+    function checkNow(){
+      triggerWorkflow('check')
     }
-    
-    function finalizeResult() {
-      // Animate log window hiding
-      const logWindow = document.getElementById('logWindow');
-      logWindow.classList.add("hidden");
-      
-      // Determine current weekday in German
-      const today = new Date();
-      const weekdays = ["Sonntag", "Montag", "Dienstag", "Mittwoch", "Donnerstag", "Freitag", "Samstag"];
-      const dayName = weekdays[today.getDay()];
-      
-      // Set result content (in production, replace dummy text with real response)
-      document.getElementById('resultHeading').textContent = `Vertretungen für ${dayName}`;
-      document.getElementById('resultText').textContent = "Hier ist das Ergebnis der Analyse: Keine Vertretungen gefunden.";
-      
-      // Show result window with animation
-      document.getElementById('resultWindow').classList.remove("hidden");
+
+
+    function fetchWorkflowLogs() {
+          const token = localStorage.getItem('github_token'); // Retrieve token
+          fetch(`https://api.github.com/repos/${GITHUB_USERNAME}/${REPO_NAME}/actions/workflows/check-now.yml/runs?status=in_progress`, {
+              headers: {
+                  'Authorization': `token ${token}`, // Use token here
+                  'Accept': 'application/vnd.github.v3+json'
+              }
+          })
+          .then(response => response.json())
+          .then(data => {
+
+              if (data.workflow_runs && data.workflow_runs.length > 0) {
+                  const runId = data.workflow_runs[0].id;
+                  fetch(`https://api.github.com/repos/${GITHUB_USERNAME}/${REPO_NAME}/actions/runs/${runId}/logs`, {
+                      headers: {
+                          'Authorization': `token ${token}`,
+                          'Accept': 'application/vnd.github.v3+json'
+                      }
+                  })
+                  .then(response => response.text())
+                  .then(logText => {
+                      processLog(logText);
+                  })
+                  .catch(error => {
+                      addLogEntry(`Error fetching logs: ${error}`);
+                      console.error("Error fetching logs:", error);
+                  });
+              } else {
+                  //addLogEntry("No workflow runs in progress.");
+                  clearInterval(logUpdateInterval); // Stop polling if no runs are in progress
+              }
+          })
+          .catch(error => {
+              addLogEntry(`Error: ${error}`);
+                container.classList.add('shake');
+                setTimeout(() => container.classList.remove('shake'), 820);
+          });
+        }
+
+        function processLog(logText) {
+          // Split the log into lines, and then process each line
+          const lines = logText.split('\n');
+          lines.forEach(line => {
+            if (line.includes("Downloading PDF")) {
+                addLogEntry("PDF downloaded.");
+            } else if (line.includes("Extracting text from PDF")) {
+                addLogEntry("Extracting text...");
+            } else if(line.includes("Starting OpenAI analysis")){
+                addLogEntry("Analyzing...");
+            }
+        });
+        if (lines.some(line => line.includes("Analysis result:"))) {
+            clearInterval(logUpdateInterval); // Stop the interval
+            workflowRunning = false;
+            const resultLine = lines.find(line => line.includes("Analysis result:"));
+            const rawResult = resultLine.split("Analysis result:")[1].trim();
+
+            // Regular expression to extract the day
+            const dayMatch = rawResult.match(/Für (\w+)/);  //Regex is correct, captures the day
+            const day = dayMatch ? dayMatch[1] : "Unbekannter Tag";
+
+
+            // Display in the result window
+            displayResult(day, rawResult);
+        }
     }
-    
-    /* Event Listeners */
-    document.getElementById('sendEmailBtn').addEventListener("click", sendEmail);
-    document.getElementById('checkNowBtn').addEventListener("click", checkNow);
-  </script>
+
+
+    function displayResult(day, result) {
+        const resultWindow = document.getElementById('result-window');
+        resultWindow.innerHTML = "";  // Clear previous result, if any
+
+        const heading = document.createElement('h2');
+        heading.textContent = `Vertretungen für ${day}`;
+        resultWindow.appendChild(heading);
+
+        const resultText = document.createElement('p');
+        resultText.textContent = result;
+        resultWindow.appendChild(resultText);
+
+        resultWindow.style.display = 'block'; // Show result window
+        minimizeLogWindow();  // Minimize the log window
+    }
+
+    </script>
 </body>
 </html>
