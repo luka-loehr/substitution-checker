@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Vertretungsplan Checker</title>
+    <style>
+        body { 
+            font-family: Arial, sans-serif; 
+            text-align: center; 
+            padding: 20px; 
+            background-color: #f5f5f5;
+        }
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            background-color: white;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        h1 { color: #333; }
+        .trigger-btn { 
+            padding: 20px 40px; 
+            font-size: 20px; 
+            background-color: #2ea44f; 
+            color: white; 
+            border: none; 
+            border-radius: 8px;
+            cursor: pointer;
+            margin: 20px 0;
+            width: 80%;
+        }
+        .trigger-btn:active {
+            background-color: #22833c;
+        }
+        #result {
+            margin-top: 20px;
+            padding: 10px;
+            border-radius: 5px;
+        }
+        .success { background-color: #d4edda; color: #155724; }
+        .error { background-color: #f8d7da; color: #721c24; }
+        .pending { background-color: #fff3cd; color: #856404; }
+        .token-input {
+            width: 90%;
+            padding: 10px;
+            margin: 10px 0;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+        .settings-btn {
+            font-size: 14px;
+            background-color: #6c757d;
+            padding: 8px 16px;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Vertretungsplan Checker</h1>
+        
+        <div id="settings-panel" style="display: none;">
+            <p>Enter your GitHub token (stored locally on your device only):</p>
+            <input type="password" id="token-input" class="token-input" placeholder="GitHub Personal Access Token" />
+            <button onclick="saveToken()" class="settings-btn">Save Token</button>
+        </div>
+        
+        <button class="trigger-btn" onclick="triggerWorkflow()">Check Now</button>
+        <p id="result">Ready to check for substitutions</p>
+        <button onclick="toggleSettings()" class="settings-btn">Settings</button>
+    </div>
+
+    <script>
+    // GitHub repository information
+    const GITHUB_USERNAME = "luka-loehr";  // Replace with your GitHub username
+    const REPO_NAME = "substitution-checker"; // Your repository name
+    const BRANCH_NAME = "main";
+    
+    function toggleSettings() {
+        const settingsPanel = document.getElementById('settings-panel');
+        if (settingsPanel.style.display === 'none') {
+            settingsPanel.style.display = 'block';
+            // Pre-fill with stored token if available
+            const storedToken = localStorage.getItem('github_token');
+            if (storedToken) {
+                document.getElementById('token-input').value = storedToken;
+            }
+        } else {
+            settingsPanel.style.display = 'none';
+        }
+    }
+    
+    function saveToken() {
+        const token = document.getElementById('token-input').value.trim();
+        if (token) {
+            localStorage.setItem('github_token', token);
+            document.getElementById('result').textContent = "Token saved";
+            document.getElementById('settings-panel').style.display = 'none';
+        } else {
+            document.getElementById('result').textContent = "Token cannot be empty";
+            document.getElementById('result').className = "error";
+        }
+    }
+
+    function triggerWorkflow() {
+        const resultElement = document.getElementById('result');
+        
+        // Get token from local storage
+        const token = localStorage.getItem('github_token');
+        
+        if (!token) {
+            resultElement.textContent = "Please set your GitHub token in Settings first";
+            resultElement.className = "error";
+            toggleSettings();
+            return;
+        }
+        
+        resultElement.textContent = "Triggering workflow...";
+        resultElement.className = "pending";
+        
+        fetch(`https://api.github.com/repos/${GITHUB_USERNAME}/${REPO_NAME}/actions/workflows/check-substitutions.yml/dispatches`, {
+            method: 'POST',
+            headers: {
+                'Authorization': `token ${token}`,
+                'Accept': 'application/vnd.github.v3+json',
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                ref: BRANCH_NAME
+            })
+        })
+        .then(response => {
+            if (response.status === 204) {
+                resultElement.textContent = "Success! Workflow triggered. Check your email in a few minutes.";
+                resultElement.className = "success";
+            } else {
+                resultElement.textContent = `Error: Status code ${response.status}`;
+                resultElement.className = "error";
+            }
+        })
+        .catch(error => {
+            resultElement.textContent = `Error: ${error.message}`;
+            resultElement.className = "error";
+        });
+    }
+    </script>
+</body>
+</html>
