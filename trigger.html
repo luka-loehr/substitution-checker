@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Vertretungsplan Checker</title>
-    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Helvetica+Neue:wght@400;700&display=swap" rel="stylesheet">
     <style>
         * {
             margin: 0;
@@ -13,9 +13,9 @@
         }
 
         body {
-            background: #121212;
+            background: linear-gradient(135deg, #2a2a2a, #1c1c1c);
             color: #e0e0e0;
-            font-family: 'Roboto', sans-serif;
+            font-family: 'Helvetica Neue', sans-serif;
             overflow-x: hidden;
             height: 100vh;
             display: flex;
@@ -24,7 +24,7 @@
             position: relative;
         }
 
-        /* Subtle Particle Background */
+        /* Particle Background */
         #particles {
             position: absolute;
             top: 0;
@@ -39,7 +39,7 @@
             background: rgba(30, 30, 30, 0.9);
             padding: 2rem;
             border-radius: 15px;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
             max-width: 700px;
             width: 90%;
             position: relative;
@@ -57,6 +57,7 @@
             margin-bottom: 2rem;
             color: #00d4ff;
             text-align: center;
+            letter-spacing: 1px;
         }
 
         .button-container {
@@ -67,7 +68,7 @@
         }
 
         .trigger-btn {
-            background: #00d4ff;
+            background: linear-gradient(45deg, #00d4ff, #00ffaa);
             border: none;
             padding: 15px 30px;
             border-radius: 30px;
@@ -75,7 +76,7 @@
             font-size: 1.2rem;
             font-weight: 700;
             cursor: pointer;
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            transition: transform 0.4s cubic-bezier(0.25, 0.1, 0.25, 1), box-shadow 0.4s cubic-bezier(0.25, 0.1, 0.25, 1);
         }
 
         .trigger-btn:hover {
@@ -101,9 +102,23 @@
         }
 
         .log-message {
-            margin: 0;
             font-size: 1rem;
             color: #e0e0e0;
+            opacity: 0;
+            transform: translateY(-20px);
+            animation: slideIn 0.5s forwards;
+        }
+
+        .log-message.out {
+            animation: slideOut 0.5s forwards;
+        }
+
+        @keyframes slideIn {
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes slideOut {
+            to { opacity: 0; transform: translateY(20px); }
         }
 
         .log-message.error {
@@ -111,13 +126,14 @@
         }
 
         #result-div {
-            background: rgba(0, 212, 255, 0.1);
+            background: linear-gradient(135deg, #00d4ff, #00ffaa);
             padding: 2rem;
             border-radius: 15px;
             opacity: 0;
             transform: scale(0.95);
-            transition: opacity 0.5s ease, transform 0.5s ease;
+            transition: opacity 0.8s cubic-bezier(0.4, 0, 0.2, 1), transform 0.8s cubic-bezier(0.4, 0, 0.2, 1);
             text-align: center;
+            color: #121212;
         }
 
         #result-div.visible {
@@ -126,24 +142,24 @@
         }
 
         #result-heading {
-            font-size: 1.5rem;
-            color: #00d4ff;
+            font-size: 2rem;
+            font-weight: 700;
             margin-bottom: 1rem;
         }
 
         #result-text {
-            font-size: 1.2rem;
-            color: #e0e0e0;
+            font-size: 1.4rem;
+            line-height: 1.6;
         }
 
         .settings-btn {
-            background: #00d4ff;
+            background: linear-gradient(45deg, #00d4ff, #00ffaa);
             padding: 10px 20px;
             border-radius: 30px;
             color: #121212;
             border: none;
             cursor: pointer;
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            transition: transform 0.4s cubic-bezier(0.25, 0.1, 0.25, 1), box-shadow 0.4s cubic-bezier(0.25, 0.1, 0.25, 1);
             margin-top: 1rem;
         }
 
@@ -160,9 +176,10 @@
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
             z-index: 3;
             display: none;
+            animation: fadeIn 0.5s forwards;
         }
 
         .token-input {
@@ -173,7 +190,6 @@
             border: 1px solid #00d4ff;
             background: #1e1e1e;
             color: #e0e0e0;
-            font-family: 'Roboto', sans-serif;
         }
 
         /* Smartphone Optimization */
@@ -200,10 +216,10 @@
                 font-size: 0.9rem;
             }
             #result-heading {
-                font-size: 1.2rem;
+                font-size: 1.5rem;
             }
             #result-text {
-                font-size: 1rem;
+                font-size: 1.2rem;
             }
         }
     </style>
@@ -230,7 +246,7 @@
     </div>
 
     <script>
-        // Subtle Particle Background
+        // Particle Background
         const canvas = document.getElementById('particles');
         const ctx = canvas.getContext('2d');
         canvas.width = window.innerWidth;
@@ -241,7 +257,7 @@
             constructor() {
                 this.x = Math.random() * canvas.width;
                 this.y = Math.random() * canvas.height;
-                this.size = Math.random() * 3 + 1;
+                this.size = Math.random() * 5 + 1;
                 this.speedX = Math.random() * 0.5 - 0.25;
                 this.speedY = Math.random() * 0.5 - 0.25;
             }
@@ -251,7 +267,7 @@
                 if (this.size > 0.1) this.size -= 0.005;
             }
             draw() {
-                ctx.fillStyle = 'rgba(0, 212, 255, 0.2)';
+                ctx.fillStyle = 'rgba(0, 212, 255, 0.5)';
                 ctx.beginPath();
                 ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
                 ctx.fill();
@@ -259,7 +275,7 @@
         }
 
         function initParticles() {
-            for (let i = 0; i < 50; i++) {
+            for (let i = 0; i < 100; i++) {
                 particlesArray.push(new Particle());
             }
         }
@@ -279,6 +295,32 @@
 
         initParticles();
         animateParticles();
+
+        // Fake Logs for Faster Perceived Performance
+        const fakeLogs = [
+            "Initializing analysis...",
+            "Connecting to server...",
+            "Processing data...",
+            "Analyzing with AI...",
+            "Generating report..."
+        ];
+
+        let fakeLogIndex = 0;
+        let logInterval;
+
+        function showFakeLog() {
+            const logWindow = document.getElementById('log-window');
+            logWindow.innerHTML = `<p class="log-message">${fakeLogs[fakeLogIndex]}</p>`;
+            fakeLogIndex = (fakeLogIndex + 1) % fakeLogs.length;
+        }
+
+        function startFakeLogs() {
+            logInterval = setInterval(showFakeLog, 2000);
+        }
+
+        function stopFakeLogs() {
+            clearInterval(logInterval);
+        }
 
         // JavaScript Logic
         function toggleSettings() {
@@ -321,6 +363,7 @@
                     if (mode === 'email') {
                         alert('Workflow triggered. Check your email soon.');
                     } else if (mode === 'check_now') {
+                        startFakeLogs();
                         setTimeout(() => getLatestRunId().then(pollRun), 1000);
                     }
                 } else {
@@ -343,13 +386,13 @@
 
         function pollRun(runId) {
             const logWindow = document.getElementById('log-window');
-            logWindow.innerHTML = '<p class="log-message">Initializing analysis...</p>';
             logWindow.classList.add('active');
 
             const interval = setInterval(async () => {
                 const runDetails = await fetchRunDetails(runId);
                 if (runDetails.status === 'completed') {
                     clearInterval(interval);
+                    stopFakeLogs();
                     const logs = await fetchLogs(runId);
                     const result = extractResult(logs);
                     if (result) showResult(result);
@@ -410,7 +453,8 @@
 
             if (messages.length > 0) {
                 const latestMessage = messages[messages.length - 1];
-                document.getElementById('log-window').innerHTML = `<p class="log-message ${latestMessage.type}">${latestMessage.text}</p>`;
+                const logWindow = document.getElementById('log-window');
+                logWindow.innerHTML = `<p class="log-message ${latestMessage.type}">${latestMessage.text}</p>`;
             }
         }
 
@@ -426,6 +470,7 @@
         }
 
         function showResult(result) {
+            stopFakeLogs();
             const logWindow = document.getElementById('log-window');
             logWindow.classList.remove('active');
             const resultDiv = document.getElementById('result-div');
@@ -444,6 +489,7 @@
         }
 
         function showError(message) {
+            stopFakeLogs();
             const logWindow = document.getElementById('log-window');
             logWindow.classList.remove('active');
             const resultDiv = document.getElementById('result-div');
