@@ -5,11 +5,15 @@ on:
     # Runs at 5 PM UTC = 7 PM CEST (German summer time)
     # Runs every day of the week
     - cron: '0 17 * * *'
-    
     # Runs at 6 PM UTC = 7 PM CET (German winter time)
     # Runs every day of the week
     - cron: '0 18 * * *'
-  workflow_dispatch:  # Allows manual triggering
+  workflow_dispatch:
+    inputs:
+      mode:
+        description: 'Mode: email or check_now'
+        required: true
+        default: 'email'
 
 jobs:
   check:
@@ -32,4 +36,5 @@ jobs:
           AUTH_PASSWORD: ${{ secrets.AUTH_PASSWORD }}
           PDF_URL: ${{ secrets.PDF_URL }}
           GITHUB_ACTIONS: "true"
+          MODE: ${{ github.event.inputs.mode }}
         run: python main.py
