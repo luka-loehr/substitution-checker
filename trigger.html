@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Vertretungsplan Checker</title>
-    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
     <style>
         * {
             margin: 0;
@@ -13,10 +13,10 @@
         }
 
         body {
-            background: linear-gradient(135deg, #0d1b2a, #1b263b);
+            background: #121212;
             color: #e0e0e0;
-            font-family: 'Orbitron', sans-serif;
-            overflow: hidden;
+            font-family: 'Roboto', sans-serif;
+            overflow-x: hidden;
             height: 100vh;
             display: flex;
             justify-content: center;
@@ -24,7 +24,7 @@
             position: relative;
         }
 
-        /* Particle Background */
+        /* Subtle Particle Background */
         #particles {
             position: absolute;
             top: 0;
@@ -36,34 +36,27 @@
         }
 
         .container {
-            background: rgba(27, 38, 59, 0.8);
+            background: rgba(30, 30, 30, 0.9);
             padding: 2rem;
             border-radius: 15px;
-            box-shadow: 0 0 40px rgba(0, 255, 255, 0.3);
-            backdrop-filter: blur(10px);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
             max-width: 700px;
             width: 90%;
             position: relative;
             z-index: 2;
-            animation: floatIn 1s ease-out forwards;
+            animation: fadeIn 1s ease-out forwards;
         }
 
-        @keyframes floatIn {
-            from { transform: translateY(100vh); opacity: 0; }
-            to { transform: translateY(0); opacity: 1; }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
         }
 
         h1 {
             font-size: 2.5rem;
             margin-bottom: 2rem;
-            color: #00ffff;
-            text-shadow: 0 0 10px #00ffff;
-            animation: neonPulse 2s infinite alternate;
-        }
-
-        @keyframes neonPulse {
-            0% { text-shadow: 0 0 5px #00ffff, 0 0 10px #00ffff; }
-            100% { text-shadow: 0 0 20px #00ffff, 0 0 30px #00ffff; }
+            color: #00d4ff;
+            text-align: center;
         }
 
         .button-container {
@@ -74,123 +67,102 @@
         }
 
         .trigger-btn {
-            background: linear-gradient(45deg, #00d4ff, #00ffaa);
+            background: #00d4ff;
             border: none;
             padding: 15px 30px;
             border-radius: 30px;
-            color: #1b263b;
+            color: #121212;
             font-size: 1.2rem;
             font-weight: 700;
             cursor: pointer;
-            transition: transform 0.3s, box-shadow 0.3s;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .trigger-btn::before {
-            content: '';
-            position: absolute;
-            top: -50%;
-            left: -50%;
-            width: 200%;
-            height: 200%;
-            background: rgba(255, 255, 255, 0.2);
-            transform: rotate(30deg);
-            transition: all 0.5s;
-        }
-
-        .trigger-btn:hover::before {
-            top: -100%;
-            left: -100%;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
         }
 
         .trigger-btn:hover {
-            transform: scale(1.1) translateY(-5px);
-            box-shadow: 0 0 20px #00d4ff;
+            transform: translateY(-5px);
+            box-shadow: 0 5px 15px rgba(0, 212, 255, 0.4);
         }
 
         #log-window {
-            background: rgba(0, 0, 0, 0.5);
+            background: rgba(0, 0, 0, 0.3);
             padding: 1rem;
             border-radius: 10px;
             max-height: 0;
             overflow: hidden;
-            transition: max-height 0.7s ease-in-out, opacity 0.5s;
+            transition: max-height 0.5s ease-in-out, opacity 0.5s ease;
             opacity: 0;
             margin-bottom: 1rem;
+            text-align: center;
         }
 
         #log-window.active {
-            max-height: 250px;
+            max-height: 100px;
             opacity: 1;
-            overflow-y: auto;
-            animation: expandGlow 0.7s ease-in-out;
-        }
-
-        @keyframes expandGlow {
-            0% { box-shadow: 0 0 0 #00ffff; }
-            50% { box-shadow: 0 0 20px #00ffff; }
-            100% { box-shadow: 0 0 10px #00ffff; }
         }
 
         .log-message {
-            margin: 0.5rem 0;
-            opacity: 0;
-            transform: translateX(-20px);
-            animation: slideInMessage 0.5s forwards;
-        }
-
-        @keyframes slideInMessage {
-            to { opacity: 1; transform: translateX(0); }
+            margin: 0;
+            font-size: 1rem;
+            color: #e0e0e0;
         }
 
         .log-message.error {
             color: #ff6b6b;
-            text-shadow: 0 0 5px #ff6b6b;
         }
 
         #result-div {
-            background: rgba(0, 255, 255, 0.1);
-            padding: 1.5rem;
-            border-radius: 10px;
+            background: rgba(0, 212, 255, 0.1);
+            padding: 2rem;
+            border-radius: 15px;
             opacity: 0;
-            transform: scale(0.8);
-            transition: opacity 0.5s, transform 0.5s;
+            transform: scale(0.95);
+            transition: opacity 0.5s ease, transform 0.5s ease;
+            text-align: center;
         }
 
         #result-div.visible {
             opacity: 1;
             transform: scale(1);
-            animation: resultPop 0.5s ease-out;
-        }
-
-        @keyframes resultPop {
-            0% { transform: scale(0.8); opacity: 0; }
-            70% { transform: scale(1.05); opacity: 1; }
-            100% { transform: scale(1); opacity: 1; }
         }
 
         #result-heading {
-            color: #00ffaa;
-            text-shadow: 0 0 10px #00ffaa;
+            font-size: 1.5rem;
+            color: #00d4ff;
             margin-bottom: 1rem;
         }
 
+        #result-text {
+            font-size: 1.2rem;
+            color: #e0e0e0;
+        }
+
+        .settings-btn {
+            background: #00d4ff;
+            padding: 10px 20px;
+            border-radius: 30px;
+            color: #121212;
+            border: none;
+            cursor: pointer;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            margin-top: 1rem;
+        }
+
+        .settings-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 3px 10px rgba(0, 212, 255, 0.4);
+        }
+
         #settings-panel {
-            background: rgba(27, 38, 59, 0.9);
-            padding: 1rem;
-            border-radius: 10px;
+            background: rgba(30, 30, 30, 0.9);
+            padding: 1.5rem;
+            border-radius: 15px;
             position: absolute;
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
-            box-shadow: 0 0 30px rgba(0, 255, 255, 0.5);
-            animation: panelFadeIn 0.5s forwards;
-        }
-
-        @keyframes panelFadeIn {
-            from { opacity: 0; transform: translate(-50%, -60%); }
-            to { opacity: 1; transform: translate(-50%, -50%); }
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+            z-index: 3;
+            display: none;
         }
 
         .token-input {
@@ -198,25 +170,41 @@
             padding: 10px;
             margin: 10px 0;
             border-radius: 5px;
-            border: 1px solid #00ffff;
-            background: #1b263b;
+            border: 1px solid #00d4ff;
+            background: #1e1e1e;
             color: #e0e0e0;
-            font-family: 'Orbitron', sans-serif;
+            font-family: 'Roboto', sans-serif;
         }
 
-        .settings-btn {
-            background: #ff00ff;
-            padding: 10px 20px;
-            border-radius: 30px;
-            color: #fff;
-            border: none;
-            cursor: pointer;
-            transition: all 0.3s;
-        }
-
-        .settings-btn:hover {
-            background: #ff66ff;
-            box-shadow: 0 0 15px #ff00ff;
+        /* Smartphone Optimization */
+        @media (max-width: 600px) {
+            h1 {
+                font-size: 1.8rem;
+            }
+            .trigger-btn {
+                font-size: 1rem;
+                padding: 12px 24px;
+            }
+            .container {
+                width: 95%;
+                padding: 1.5rem;
+            }
+            .button-container {
+                flex-direction: column;
+                gap: 1rem;
+            }
+            .trigger-btn {
+                width: 100%;
+            }
+            #log-window {
+                font-size: 0.9rem;
+            }
+            #result-heading {
+                font-size: 1.2rem;
+            }
+            #result-text {
+                font-size: 1rem;
+            }
         }
     </style>
 </head>
@@ -234,7 +222,7 @@
             <p id="result-text"></p>
         </div>
         <button class="settings-btn" onclick="toggleSettings()">Settings</button>
-        <div id="settings-panel" style="display: none;">
+        <div id="settings-panel">
             <p>Enter your GitHub Token:</p>
             <input type="password" id="token-input" class="token-input" placeholder="GitHub Personal Access Token" />
             <button onclick="saveToken()" class="settings-btn">Save Token</button>
@@ -242,7 +230,7 @@
     </div>
 
     <script>
-        // Particle Background
+        // Subtle Particle Background
         const canvas = document.getElementById('particles');
         const ctx = canvas.getContext('2d');
         canvas.width = window.innerWidth;
@@ -253,17 +241,17 @@
             constructor() {
                 this.x = Math.random() * canvas.width;
                 this.y = Math.random() * canvas.height;
-                this.size = Math.random() * 5 + 1;
-                this.speedX = Math.random() * 1 - 0.5;
-                this.speedY = Math.random() * 1 - 0.5;
+                this.size = Math.random() * 3 + 1;
+                this.speedX = Math.random() * 0.5 - 0.25;
+                this.speedY = Math.random() * 0.5 - 0.25;
             }
             update() {
                 this.x += this.speedX;
                 this.y += this.speedY;
-                if (this.size > 0.2) this.size -= 0.01;
+                if (this.size > 0.1) this.size -= 0.005;
             }
             draw() {
-                ctx.fillStyle = 'rgba(0, 255, 255, 0.5)';
+                ctx.fillStyle = 'rgba(0, 212, 255, 0.2)';
                 ctx.beginPath();
                 ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
                 ctx.fill();
@@ -271,22 +259,21 @@
         }
 
         function initParticles() {
-            for (let i = 0; i < 100; i++) {
+            for (let i = 0; i < 50; i++) {
                 particlesArray.push(new Particle());
             }
         }
 
         function animateParticles() {
             ctx.clearRect(0, 0, canvas.width, canvas.height);
-            for (let i = 0; i < particlesArray.length; i++) {
-                particlesArray[i].update();
-                particlesArray[i].draw();
-                if (particlesArray[i].size <= 0.2) {
-                    particlesArray.splice(i, 1);
-                    i--;
+            particlesArray.forEach((particle, index) => {
+                particle.update();
+                particle.draw();
+                if (particle.size <= 0.1) {
+                    particlesArray.splice(index, 1);
                     particlesArray.push(new Particle());
                 }
-            }
+            });
             requestAnimationFrame(animateParticles);
         }
 
@@ -294,8 +281,6 @@
         animateParticles();
 
         // JavaScript Logic
-        let displayedMessages = [];
-
         function toggleSettings() {
             const panel = document.getElementById('settings-panel');
             panel.style.display = panel.style.display === 'none' ? 'block' : 'none';
@@ -336,7 +321,7 @@
                     if (mode === 'email') {
                         alert('Workflow triggered. Check your email soon.');
                     } else if (mode === 'check_now') {
-                        setTimeout(() => getLatestRunId().then(pollRun), 2000);
+                        setTimeout(() => getLatestRunId().then(pollRun), 1000);
                     }
                 } else {
                     alert('Error triggering workflow');
@@ -360,7 +345,6 @@
             const logWindow = document.getElementById('log-window');
             logWindow.innerHTML = '<p class="log-message">Initializing analysis...</p>';
             logWindow.classList.add('active');
-            displayedMessages = [];
 
             const interval = setInterval(async () => {
                 const runDetails = await fetchRunDetails(runId);
@@ -373,9 +357,8 @@
                 } else {
                     const logs = await fetchLogs(runId);
                     updateLogWindow(logs);
-                    logWindow.scrollTop = logWindow.scrollHeight;
                 }
-            }, 5000);
+            }, 2000); // Poll every 2 seconds
         }
 
         async function fetchRunDetails(runId) {
@@ -410,7 +393,7 @@
 
         function updateLogWindow(logs) {
             const lines = logs.split('\n');
-            const newMessages = lines
+            const messages = lines
                 .map(line => {
                     const parts = line.split(' - ');
                     if (parts.length >= 3) {
@@ -423,15 +406,12 @@
                     }
                     return null;
                 })
-                .filter(msg => msg && !displayedMessages.includes(msg.text));
+                .filter(msg => msg);
 
-            newMessages.forEach(msg => {
-                const p = document.createElement('p');
-                p.textContent = msg.text;
-                p.classList.add('log-message', msg.type);
-                document.getElementById('log-window').appendChild(p);
-                displayedMessages.push(msg.text);
-            });
+            if (messages.length > 0) {
+                const latestMessage = messages[messages.length - 1];
+                document.getElementById('log-window').innerHTML = `<p class="log-message ${latestMessage.type}">${latestMessage.text}</p>`;
+            }
         }
 
         function extractResult(logs) {
