@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vertretungsplan Dashboard</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: linear-gradient(135deg, #3B82F6, #2563EB);
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 400px;
+            position: relative;
+        }
+
+        .welcome-text {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        h1 {
+            color: #1F2937;
+            margin: 0;
+        }
+
+        .class-text {
+            color: #6B7280;
+            margin-top: 5px;
+        }
+
+        .check-button {
+            width: 100%;
+            padding: 15px;
+            font-size: 16px;
+            background-color: #3B82F6;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-bottom: 20px;
+        }
+
+        .check-button:hover {
+            background-color: #2563EB;
+        }
+
+        .check-button.loading {
+            opacity: 0.8;
+            cursor: wait;
+        }
+
+        .check-button.success {
+            background-color: #10B981;
+        }
+
+        .check-button.error {
+            background-color: #EF4444;
+        }
+
+        .settings-button {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 5px;
+        }
+
+        .settings-button svg {
+            width: 24px;
+            height: 24px;
+            color: #6B7280;
+        }
+
+        .settings-panel {
+            display: none;
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 1px solid #E5E7EB;
+        }
+
+        .settings-panel.active {
+            display: block;
+        }
+
+        .input-group {
+            margin-bottom: 15px;
+        }
+
+        .input-group label {
+            display: block;
+            margin-bottom: 5px;
+            color: #4B5563;
+        }
+
+        .input-group input {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #D1D5DB;
+            border-radius: 6px;
+            box-sizing: border-box;
+        }
+
+        .save-button {
+            width: 100%;
+            padding: 10px;
+            background-color: #6B7280;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+
+        .save-button:hover {
+            background-color: #4B5563;
+        }
+
+        @keyframes dots {
+            0%, 20% { content: ''; }
+            40% { content: '.'; }
+            60% { content: '..'; }
+            80% { content: '...'; }
+        }
+
+        .loading::after {
+            content: '';
+            animation: dots 1.5s steps(5, end) infinite;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <button class="settings-button" onclick="toggleSettings()">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/>
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+            </svg>
+        </button>
+
+        <div class="welcome-text">
+            <h1 id="welcomeMessage">Willkommen</h1>
+            <p id="userClass" class="class-text"></p>
+        </div>
+
+        <button id="checkButton" class="check-button" onclick="checkSubstitutions()">
+            Nach Vertretungen suchen
+        </button>
+
+        <div id="settingsPanel" class="settings-panel">
+            <div class="input-group">
+                <label for="emailSetting">E-Mail</label>
+                <input type="email" id="emailSetting">
+            </div>
+            <div class="input-group">
+                <label for="timeSetting">Benachrichtigungszeit</label>
+                <input type="time" id="timeSetting">
+            </div>
+            <button class="save-button" onclick="saveSettings()">Speichern</button>
+        </div>
+    </div>
+
+    <script>
+        // Check if user exists
+        const userData = JSON.parse(localStorage.getItem('userData'));
+        if (!userData) {
+            window.location.href = 'index.html';
+        }
+
+        // Update welcome message
+        document.getElementById('welcomeMessage').textContent = `Willkommen, ${userData.name}`;
+        document.getElementById('userClass').textContent = `Klasse ${userData.class}`;
+
+        // Initialize settings
+        document.getElementById('emailSetting').value = userData.email;
+        document.getElementById('timeSetting').value = userData.notificationTime;
+
+        function toggleSettings() {
+            const panel = document.getElementById('settingsPanel');
+            panel.classList.toggle('active');
+        }
+
+        function saveSettings() {
+            const email = document.getElementById('emailSetting').value;
+            const time = document.getElementById('timeSetting').value;
+
+            userData.email = email;
+            userData.notificationTime = time;
+            localStorage.setItem('userData', JSON.stringify(userData));
+
+            toggleSettings();
+        }
+
+        function checkSubstitutions() {
+            const button = document.getElementById('checkButton');
+            
+            // Loading state
+            button.classList.add('loading');
+            button.textContent = 'Überprüfe Vertretungen';
+            button.disabled = true;
+
+            // Simulate check (replace with actual check later)
+            setTimeout(() => {
+                // Success state (example)
+                button.classList.remove('loading');
+                button.classList.add('success');
+                button.textContent = 'Keine Vertretungen für Montag';
+
+                // Reset after 10 seconds
+                setTimeout(() => {
+                    button.classList.remove('success');
+                    button.textContent = 'Nach Vertretungen suchen';
+                    button.disabled = false;
+                }, 10000);
+            }, 2000);
+        }
+    </script>
+</body>
+</html>
