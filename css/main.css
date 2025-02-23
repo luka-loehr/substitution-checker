@@ -1,0 +1,60 @@
+:root {
+    --primary: #3B82F6;
+    --primary-dark: #2563EB;
+    --success: #16a34a;
+    --error: #dc2626;
+    --white: #ffffff;
+}
+
+body { 
+    font-family: system-ui, -apple-system, sans-serif;
+    background: linear-gradient(120deg, var(--primary), var(--primary-dark));
+    background-size: 200% 200%;
+    min-height: 100vh;
+    color: var(--white);
+    margin: 0;
+    padding: 1rem;
+}
+
+.container {
+    backdrop-filter: blur(10px);
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 1rem;
+    padding: 2rem;
+    max-width: 600px;
+    margin: 20px auto;
+}
+
+.input-field {
+    width: 100%;
+    padding: 0.75rem 1rem;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 0.5rem;
+    color: var(--white);
+    transition: all 0.3s ease;
+}
+
+.input-field:focus {
+    outline: none;
+    border-color: rgba(255, 255, 255, 0.5);
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.button {
+    width: 100%;
+    padding: 1rem;
+    border: none;
+    border-radius: 0.5rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.settings-panel {
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 0.75rem;
+    padding: 1.5rem;
+    margin-top: 2rem;
+}
