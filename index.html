@@ -65,6 +65,33 @@
         button:hover {
             background-color: #2563EB;
         }
+
+        .checkbox-group {
+            margin: 20px 0;
+            display: flex;
+            align-items: center;
+            cursor: pointer;
+        }
+
+        .checkbox-group input[type="checkbox"] {
+            width: auto;
+            margin-right: 10px;
+        }
+
+        .email-settings {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease-out;
+        }
+
+        .email-settings.active {
+            max-height: 200px;
+        }
+
+        .divider {
+            margin: 20px 0;
+            border-top: 1px solid #E5E7EB;
+        }
     </style>
 </head>
 <body>
@@ -81,14 +108,21 @@
             <input type="text" id="userClass" placeholder="Deine Klasse">
         </div>
 
-        <div class="input-group">
-            <label for="userEmail">Deine E-Mail</label>
-            <input type="email" id="userEmail" placeholder="Deine E-Mail">
+        <div class="checkbox-group">
+            <input type="checkbox" id="emailNotifications" onchange="toggleEmailSettings()">
+            <label for="emailNotifications">Benachrichtige mich per E-Mail</label>
         </div>
 
-        <div class="input-group">
-            <label for="notificationTime">Benachrichtigungszeit</label>
-            <input type="time" id="notificationTime" value="19:00">
+        <div id="emailSettings" class="email-settings">
+            <div class="input-group">
+                <label for="userEmail">Deine E-Mail</label>
+                <input type="email" id="userEmail" placeholder="Deine E-Mail">
+            </div>
+
+            <div class="input-group">
+                <label for="notificationTime">Benachrichtigungszeit</label>
+                <input type="time" id="notificationTime" value="19:00">
+            </div>
         </div>
 
         <button onclick="saveSettings()">Einrichtung abschließen</button>
@@ -100,22 +134,35 @@
             window.location.href = 'dashboard.html';
         }
 
+        function toggleEmailSettings() {
+            const emailSettings = document.getElementById('emailSettings');
+            const checkbox = document.getElementById('emailNotifications');
+            emailSettings.classList.toggle('active', checkbox.checked);
+        }
+
         function saveSettings() {
             const name = document.getElementById('userName').value.trim();
             const className = document.getElementById('userClass').value.trim();
+            const emailNotifications = document.getElementById('emailNotifications').checked;
             const email = document.getElementById('userEmail').value.trim();
             const time = document.getElementById('notificationTime').value;
 
-            if (!name || !className || !email) {
-                alert('Bitte fülle alle Felder aus.');
+            if (!name || !className) {
+                alert('Bitte gib deinen Namen und deine Klasse ein.');
+                return;
+            }
+
+            if (emailNotifications && !email) {
+                alert('Bitte gib deine E-Mail-Adresse ein.');
                 return;
             }
 
             const userData = {
                 name,
                 class: className,
-                email,
-                notificationTime: time
+                emailNotifications,
+                email: emailNotifications ? email : null,
+                notificationTime: emailNotifications ? time : null
             };
 
             localStorage.setItem('userData', JSON.stringify(userData));
