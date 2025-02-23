@@ -1,134 +1,145 @@
 <!DOCTYPE html>
-<html>
+<html lang="de">
 <head>
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Vertretungsplan Checker</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vertretungsplan Checker - Setup</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
     <style>
-        body { 
-            font-family: Arial, sans-serif; 
-            text-align: center; 
-            padding: 20px; 
-            background-color: #f5f5f5;
+        .fade-bg {
+            background: linear-gradient(120deg, #3B82F6, #2563EB);
+            animation: gradientBG 15s ease infinite;
         }
-        .container {
-            max-width: 600px;
-            margin: 0 auto;
-            background-color: white;
-            border-radius: 10px;
-            padding: 20px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        
+        @keyframes gradientBG {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
         }
-        h1 { color: #333; }
-        .trigger-btn { 
-            padding: 20px 40px; 
-            font-size: 20px; 
-            background-color: #2ea44f; 
-            color: white; 
-            border: none; 
-            border-radius: 8px;
-            cursor: pointer;
-            margin: 20px 0;
-            width: 80%;
+
+        .setup-container {
+            backdrop-filter: blur(10px);
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
         }
-        .trigger-btn:active {
-            background-color: #22833c;
+
+        .input-field {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            transition: all 0.3s ease;
         }
-        #result {
-            margin-top: 20px;
-            padding: 10px;
-            border-radius: 5px;
+
+        .input-field:focus {
+            background: rgba(255, 255, 255, 0.1);
+            border-color: rgba(255, 255, 255, 0.5);
         }
-        .success { background-color: #d4edda; color: #155724; }
-        .error { background-color: #f8d7da; color: #721c24; }
-        .pending { background-color: #fff3cd; color: #856404; }
+
+        .next-button {
+            transition: all 0.3s ease;
+        }
+
+        .next-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
     </style>
 </head>
-<body>
-    <div class="container">
-        <h1>Vertretungsplan Checker</h1>
-        
-        <div id="settings-panel" style="display: none;">
-            <p>Enter your GitHub token (stored locally on your device only):</p>
-            <input type="password" id="token-input" class="token-input" placeholder="GitHub Personal Access Token" />
-            <button onclick="saveToken()" class="settings-btn">Save Token</button>
+<body class="fade-bg min-h-screen flex items-center justify-center p-4">
+    <div class="setup-container rounded-2xl p-8 w-full max-w-md">
+        <div id="step1" class="animate-fade-in">
+            <h1 class="text-3xl font-bold text-white mb-8 text-center">Willkommen beim<br>Vertretungsplan Checker</h1>
+            
+            <div class="space-y-4">
+                <div>
+                    <label class="block text-white text-sm font-medium mb-2">Dein Name</label>
+                    <input type="text" id="userName" 
+                           class="input-field w-full px-4 py-2 rounded-lg text-white placeholder-gray-400"
+                           placeholder="Max Mustermann">
+                </div>
+                
+                <div>
+                    <label class="block text-white text-sm font-medium mb-2">Deine Klasse</label>
+                    <input type="text" id="userClass" 
+                           class="input-field w-full px-4 py-2 rounded-lg text-white placeholder-gray-400"
+                           placeholder="9b">
+                </div>
+            </div>
+
+            <button onclick="nextStep()" 
+                    class="next-button w-full mt-8 bg-white text-blue-600 font-medium py-3 px-4 rounded-lg">
+                Weiter
+            </button>
         </div>
-        
-        <button class="trigger-btn" onclick="triggerWorkflow()">Check Now</button>
-        <p id="result">Ready to check for substitutions</p>
-        <button onclick="toggleSettings()" class="settings-btn">Settings</button>
+
+        <div id="step2" class="hidden animate-fade-in">
+            <h2 class="text-2xl font-bold text-white mb-8 text-center">E-Mail Benachrichtigungen</h2>
+            
+            <div class="space-y-4">
+                <div>
+                    <label class="block text-white text-sm font-medium mb-2">Deine E-Mail</label>
+                    <input type="email" id="userEmail" 
+                           class="input-field w-full px-4 py-2 rounded-lg text-white placeholder-gray-400"
+                           placeholder="max@beispiel.de">
+                </div>
+                
+                <div>
+                    <label class="block text-white text-sm font-medium mb-2">Benachrichtigungszeit</label>
+                    <input type="time" id="notificationTime" 
+                           class="input-field w-full px-4 py-2 rounded-lg text-white"
+                           value="19:00">
+                </div>
+            </div>
+
+            <button onclick="finishSetup()" 
+                    class="next-button w-full mt-8 bg-white text-blue-600 font-medium py-3 px-4 rounded-lg">
+                Einrichtung abschließen
+            </button>
+        </div>
     </div>
 
     <script>
-    // GitHub repository information
-    const GITHUB_USERNAME = "luka-loehr";  // Replace with your GitHub username
-    const REPO_NAME = "substitution-checker"; // Your repository name
-    const BRANCH_NAME = "main";
-    
-    function toggleSettings() {
-        const settingsPanel = document.getElementById('settings-panel');
-        if (settingsPanel.style.display === 'none') {
-            settingsPanel.style.display = 'block';
-            const storedToken = localStorage.getItem('github_token');
-            if (storedToken) {
-                document.getElementById('token-input').value = storedToken;
-            }
-        } else {
-            settingsPanel.style.display = 'none';
+        // Check if user already exists
+        if (localStorage.getItem('userData')) {
+            window.location.href = 'dashboard.html';
         }
-    }
-    
-    function saveToken() {
-        const token = document.getElementById('token-input').value.trim();
-        if (token) {
-            localStorage.setItem('github_token', token);
-            document.getElementById('result').textContent = "Token saved";
-            document.getElementById('settings-panel').style.display = 'none';
-        } else {
-            document.getElementById('result').textContent = "Token cannot be empty";
-            document.getElementById('result').className = "error";
-        }
-    }
 
-    function triggerWorkflow() {
-        const resultElement = document.getElementById('result');
-        
-        const token = localStorage.getItem('github_token');
-        
-        if (!token) {
-            resultElement.textContent = "Please set your GitHub token in Settings first";
-            resultElement.className = "error";
-            toggleSettings();
-            return;
-        }
-        
-        resultElement.textContent = "Triggering workflow...";
-        resultElement.className = "pending";
-        
-        fetch(`https://api.github.com/repos/${GITHUB_USERNAME}/${REPO_NAME}/actions/workflows/check-substitutions.yml/dispatches`, {
-            method: 'POST',
-            headers: {
-                'Authorization': `token ${token}`,
-                'Accept': 'application/vnd.github.v3+json',
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({
-                ref: BRANCH_NAME
-            })
-        })
-        .then(response => {
-            if (response.status === 204) {
-                resultElement.textContent = "Success! Workflow triggered. Check your email in a few minutes.";
-                resultElement.className = "success";
-            } else {
-                resultElement.textContent = `Error: Status code ${response.status}`;
-                resultElement.className = "error";
+        function nextStep() {
+            const name = document.getElementById('userName').value.trim();
+            const className = document.getElementById('userClass').value.trim();
+
+            if (!name || !className) {
+                alert('Bitte fülle alle Felder aus.');
+                return;
             }
-        })
-        .catch(error => {
-            resultElement.textContent = `Error: ${error.message}`;
-            resultElement.className = "error";
-        });
-    }
+
+            document.getElementById('step1').classList.add('hidden');
+            document.getElementById('step2').classList.remove('hidden');
+        }
+
+        function finishSetup() {
+            const name = document.getElementById('userName').value.trim();
+            const className = document.getElementById('userClass').value.trim();
+            const email = document.getElementById('userEmail').value.trim();
+            const notificationTime = document.getElementById('notificationTime').value;
+
+            if (!name || !className || !email || !notificationTime) {
+                alert('Bitte fülle alle Felder aus.');
+                return;
+            }
+
+            const userData = {
+                name,
+                class: className,
+                email,
+                notificationTime,
+                settings: {
+                    emailNotifications: true
+                }
+            };
+
+            localStorage.setItem('userData', JSON.stringify(userData));
+            window.location.href = 'dashboard.html';
+        }
     </script>
 </body>
 </html>
