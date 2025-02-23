@@ -98,6 +98,26 @@
             display: block;
         }
 
+        .checkbox-group {
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+        }
+
+        .checkbox-group input[type="checkbox"] {
+            margin-right: 10px;
+        }
+
+        .email-settings {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease-out;
+        }
+
+        .email-settings.active {
+            max-height: 200px;
+        }
+
         .input-group {
             margin-bottom: 15px;
         }
@@ -162,13 +182,20 @@
         </button>
 
         <div id="settingsPanel" class="settings-panel">
-            <div class="input-group">
-                <label for="emailSetting">E-Mail</label>
-                <input type="email" id="emailSetting">
+            <div class="checkbox-group">
+                <input type="checkbox" id="emailNotifications" onchange="toggleEmailSettings()">
+                <label for="emailNotifications">Benachrichtige mich per E-Mail</label>
             </div>
-            <div class="input-group">
-                <label for="timeSetting">Benachrichtigungszeit</label>
-                <input type="time" id="timeSetting">
+
+            <div id="emailSettings" class="email-settings">
+                <div class="input-group">
+                    <label for="emailSetting">E-Mail</label>
+                    <input type="email" id="emailSetting">
+                </div>
+                <div class="input-group">
+                    <label for="timeSetting">Benachrichtigungszeit</label>
+                    <input type="time" id="timeSetting">
+                </div>
             </div>
             <button class="save-button" onclick="saveSettings()">Speichern</button>
         </div>
@@ -186,22 +213,40 @@
         document.getElementById('userClass').textContent = `Klasse ${userData.class}`;
 
         // Initialize settings
-        document.getElementById('emailSetting').value = userData.email;
-        document.getElementById('timeSetting').value = userData.notificationTime;
+        const emailCheckbox = document.getElementById('emailNotifications');
+        emailCheckbox.checked = userData.emailNotifications || false;
+        if (userData.emailNotifications) {
+            document.getElementById('emailSettings').classList.add('active');
+            document.getElementById('emailSetting').value = userData.email;
+            document.getElementById('timeSetting').value = userData.notificationTime;
+        }
 
         function toggleSettings() {
             const panel = document.getElementById('settingsPanel');
             panel.classList.toggle('active');
         }
 
+        function toggleEmailSettings() {
+            const emailSettings = document.getElementById('emailSettings');
+            const checkbox = document.getElementById('emailNotifications');
+            emailSettings.classList.toggle('active', checkbox.checked);
+        }
+
         function saveSettings() {
+            const emailNotifications = document.getElementById('emailNotifications').checked;
             const email = document.getElementById('emailSetting').value;
             const time = document.getElementById('timeSetting').value;
 
-            userData.email = email;
-            userData.notificationTime = time;
-            localStorage.setItem('userData', JSON.stringify(userData));
+            if (emailNotifications && !email) {
+                alert('Bitte gib deine E-Mail-Adresse ein.');
+                return;
+            }
 
+            userData.emailNotifications = emailNotifications;
+            userData.email = emailNotifications ? email : null;
+            userData.notificationTime = emailNotifications ? time : null;
+
+            localStorage.setItem('userData', JSON.stringify(userData));
             toggleSettings();
         }
 
