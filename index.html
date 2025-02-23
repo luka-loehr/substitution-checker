@@ -4,45 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Vertretungsplan Checker - Setup</title>
-    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
-    <style>
-        .fade-bg {
-            background: linear-gradient(120deg, #3B82F6, #2563EB);
-            animation: gradientBG 15s ease infinite;
-        }
-        
-        @keyframes gradientBG {
-            0% { background-position: 0% 50%; }
-            50% { background-position: 100% 50%; }
-            100% { background-position: 0% 50%; }
-        }
-
-        .setup-container {
-            backdrop-filter: blur(10px);
-            background: rgba(255, 255, 255, 0.1);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-        }
-
-        .input-field {
-            background: rgba(255, 255, 255, 0.05);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            transition: all 0.3s ease;
-        }
-
-        .input-field:focus {
-            background: rgba(255, 255, 255, 0.1);
-            border-color: rgba(255, 255, 255, 0.5);
-        }
-
-        .next-button {
-            transition: all 0.3s ease;
-        }
-
-        .next-button:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-        }
-    </style>
+    <link href="https://cdn.tailwindcss.com" rel="stylesheet">
+    <link href="css/main.css" rel="stylesheet">
+    <link href="css/animations.css" rel="stylesheet">
 </head>
 <body class="fade-bg min-h-screen flex items-center justify-center p-4">
     <div class="setup-container rounded-2xl p-8 w-full max-w-md">
@@ -65,7 +29,7 @@
                 </div>
             </div>
 
-            <button onclick="nextStep()" 
+            <button id="nextButton"
                     class="next-button w-full mt-8 bg-white text-blue-600 font-medium py-3 px-4 rounded-lg">
                 Weiter
             </button>
@@ -90,56 +54,13 @@
                 </div>
             </div>
 
-            <button onclick="finishSetup()" 
+            <button id="finishButton"
                     class="next-button w-full mt-8 bg-white text-blue-600 font-medium py-3 px-4 rounded-lg">
                 Einrichtung abschließen
             </button>
         </div>
     </div>
 
-    <script>
-        // Check if user already exists
-        if (localStorage.getItem('userData')) {
-            window.location.href = 'dashboard.html';
-        }
-
-        function nextStep() {
-            const name = document.getElementById('userName').value.trim();
-            const className = document.getElementById('userClass').value.trim();
-
-            if (!name || !className) {
-                alert('Bitte fülle alle Felder aus.');
-                return;
-            }
-
-            document.getElementById('step1').classList.add('hidden');
-            document.getElementById('step2').classList.remove('hidden');
-        }
-
-        function finishSetup() {
-            const name = document.getElementById('userName').value.trim();
-            const className = document.getElementById('userClass').value.trim();
-            const email = document.getElementById('userEmail').value.trim();
-            const notificationTime = document.getElementById('notificationTime').value;
-
-            if (!name || !className || !email || !notificationTime) {
-                alert('Bitte fülle alle Felder aus.');
-                return;
-            }
-
-            const userData = {
-                name,
-                class: className,
-                email,
-                notificationTime,
-                settings: {
-                    emailNotifications: true
-                }
-            };
-
-            localStorage.setItem('userData', JSON.stringify(userData));
-            window.location.href = 'dashboard.html';
-        }
-    </script>
+    <script src="js/setup.js"></script>
 </body>
 </html>
