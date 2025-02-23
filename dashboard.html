@@ -4,103 +4,14 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Vertretungsplan Dashboard</title>
-    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
-    <style>
-        .fade-bg {
-            background: linear-gradient(120deg, #3B82F6, #2563EB);
-            background-size: 200% 200%;
-            animation: gradientBG 15s ease infinite;
-        }
-        
-        @keyframes gradientBG {
-            0% { background-position: 0% 50%; }
-            50% { background-position: 100% 50%; }
-            100% { background-position: 0% 50%; }
-        }
-
-        .dashboard-container {
-            backdrop-filter: blur(10px);
-            background: rgba(255, 255, 255, 0.1);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-        }
-
-        .check-button {
-            transition: all 0.5s ease;
-            background: rgba(59, 130, 246, 0.8);
-            overflow: hidden;
-            position: relative;
-        }
-
-        .check-button::after {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(255, 255, 255, 0.1);
-            opacity: 0;
-            transition: opacity 0.3s;
-        }
-
-        .check-button:hover::after {
-            opacity: 1;
-        }
-
-        .check-button.success {
-            background: rgba(22, 163, 74, 0.8);
-            transform: scale(1.05);
-        }
-
-        .check-button.error {
-            background: rgba(220, 38, 38, 0.8);
-            transform: scale(1.05);
-        }
-
-        @keyframes expandButton {
-            0% { transform: scale(1); }
-            50% { transform: scale(1.1); }
-            100% { transform: scale(1); }
-        }
-
-        .settings-icon {
-            transition: transform 0.3s ease;
-        }
-
-        .settings-icon:hover {
-            transform: rotate(45deg);
-        }
-
-        #settingsPanel {
-            transform: translateY(-20px);
-            opacity: 0;
-            visibility: hidden;
-            transition: all 0.3s ease;
-        }
-
-        #settingsPanel.active {
-            transform: translateY(0);
-            opacity: 1;
-            visibility: visible;
-        }
-
-        .loading-dots::after {
-            content: '...';
-            animation: dots 1.5s steps(4, end) infinite;
-        }
-
-        @keyframes dots {
-            0%, 20% { content: ''; }
-            40% { content: '.'; }
-            60% { content: '..'; }
-            80% { content: '...'; }
-        }
-    </style>
+    <link href="https://cdn.tailwindcss.com" rel="stylesheet">
+    <link href="css/main.css" rel="stylesheet">
+    <link href="css/animations.css" rel="stylesheet">
 </head>
 <body class="fade-bg min-h-screen flex items-center justify-center p-4">
     <div class="dashboard-container rounded-2xl p-8 w-full max-w-md relative">
         <!-- Settings Icon -->
-        <button onclick="toggleSettings()" class="settings-icon absolute top-4 right-4 text-white p-2">
+        <button class="settings-icon absolute top-4 right-4 text-white p-2">
             <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/>
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
@@ -115,7 +26,6 @@
 
         <!-- Main Button -->
         <button id="checkButton" 
-                onclick="checkSubstitutions()" 
                 class="check-button w-full py-4 px-6 rounded-xl text-white text-lg font-medium shadow-lg">
             Nach Vertretungen suchen
         </button>
@@ -137,7 +47,7 @@
                            class="w-full bg-white/10 border border-white/20 rounded-lg px-4 py-2 text-white">
                 </div>
 
-                <button onclick="saveSettings()" 
+                <button id="saveSettings" 
                         class="w-full bg-white/20 hover:bg-white/30 text-white py-2 rounded-lg transition-all">
                     Speichern
                 </button>
@@ -145,86 +55,7 @@
         </div>
     </div>
 
-    <script>
-        // Check if user exists, if not redirect to setup
-        if (!localStorage.getItem('userData')) {
-            window.location.href = 'index.html';
-        }
-
-        // Load user data
-        const userData = JSON.parse(localStorage.getItem('userData'));
-        document.getElementById('welcomeMessage').textContent = `Willkommen, ${userData.name}`;
-        document.getElementById('userClass').textContent = `Klasse ${userData.class}`;
-
-        // Initialize settings
-        document.getElementById('emailSetting').value = userData.email;
-        document.getElementById('timeSetting').value = userData.notificationTime;
-
-        function toggleSettings() {
-            const panel = document.getElementById('settingsPanel');
-            panel.classList.toggle('active');
-        }
-
-        function saveSettings() {
-            const email = document.getElementById('emailSetting').value;
-            const time = document.getElementById('timeSetting').value;
-
-            userData.email = email;
-            userData.notificationTime = time;
-            localStorage.setItem('userData', JSON.stringify(userData));
-
-            toggleSettings();
-        }
-
-        async function checkSubstitutions() {
-            const button = document.getElementById('checkButton');
-            
-            // Loading state
-            button.textContent = 'Überprüfe Vertretungen';
-            button.classList.add('loading-dots');
-            button.disabled = true;
-
-            try {
-                // Your GitHub workflow trigger code here
-                const response = await fetch(`https://api.github.com/repos/luka-loehr/substitution-checker/actions/workflows/check-substitutions.yml/dispatches`, {
-                    method: 'POST',
-                    headers: {
-                        'Authorization': `token ${localStorage.getItem('github_token')}`,
-                        'Accept': 'application/vnd.github.v3+json',
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({ ref: 'main' })
-                });
-
-                if (response.status === 204) {
-                    // Success animation
-                    button.classList.remove('loading-dots');
-                    button.classList.add('success');
-                    button.textContent = 'Keine Vertretungen für Montag';
-                    
-                    // Reset after 10 seconds
-                    setTimeout(() => {
-                        button.classList.remove('success');
-                        button.textContent = 'Nach Vertretungen suchen';
-                        button.disabled = false;
-                    }, 10000);
-                } else {
-                    throw new Error('Workflow trigger failed');
-                }
-            } catch (error) {
-                // Error animation
-                button.classList.remove('loading-dots');
-                button.classList.add('error');
-                button.textContent = 'Fehler bei der Überprüfung';
-                
-                // Reset after 5 seconds
-                setTimeout(() => {
-                    button.classList.remove('error');
-                    button.textContent = 'Nach Vertretungen suchen';
-                    button.disabled = false;
-                }, 5000);
-            }
-        }
-    </script>
+    <script src="js/dashboard.js"></script>
+    <script src="js/settings.js"></script>
 </body>
 </html>
