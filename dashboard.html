@@ -24,6 +24,12 @@
             width: 100%;
             max-width: 400px;
             position: relative;
+            transition: all 0.3s ease;
+            min-height: 200px;
+        }
+
+        .container.settings-open {
+            min-height: 400px;
         }
 
         .welcome-text {
@@ -71,6 +77,12 @@
             background-color: #EF4444;
         }
 
+        .check-button.hidden {
+            opacity: 0;
+            transform: translateY(20px);
+            pointer-events: none;
+        }
+
         .settings-button {
             position: absolute;
             top: 20px;
@@ -85,16 +97,23 @@
             width: 24px;
             height: 24px;
             color: #6B7280;
+            transition: transform 0.3s ease;
+        }
+
+        .settings-button:hover svg {
+            transform: rotate(90deg);
         }
 
         .settings-panel {
+            opacity: 0;
+            transform: translateY(20px);
+            transition: all 0.3s ease;
             display: none;
-            margin-top: 20px;
-            padding-top: 20px;
-            border-top: 1px solid #E5E7EB;
         }
 
         .settings-panel.active {
+            opacity: 1;
+            transform: translateY(0);
             display: block;
         }
 
@@ -138,16 +157,20 @@
 
         .save-button {
             width: 100%;
-            padding: 10px;
-            background-color: #6B7280;
+            padding: 12px 24px;
+            background: linear-gradient(135deg, #3B82F6, #2563EB);
             color: white;
             border: none;
-            border-radius: 6px;
+            border-radius: 8px;
             cursor: pointer;
+            margin-top: 20px;
+            font-size: 16px;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
         }
 
         .save-button:hover {
-            background-color: #4B5563;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(37, 99, 235, 0.2);
         }
 
         @keyframes dots {
@@ -164,7 +187,7 @@
     </style>
 </head>
 <body>
-    <div class="container">
+    <div class="container" id="mainContainer">
         <button class="settings-button" onclick="toggleSettings()">
             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/>
@@ -182,6 +205,8 @@
         </button>
 
         <div id="settingsPanel" class="settings-panel">
+            <h2 style="margin-bottom: 20px; color: #1F2937;">Einstellungen</h2>
+            
             <div class="checkbox-group">
                 <input type="checkbox" id="emailNotifications" onchange="toggleEmailSettings()">
                 <label for="emailNotifications">Benachrichtige mich per E-Mail</label>
@@ -197,7 +222,10 @@
                     <input type="time" id="timeSetting">
                 </div>
             </div>
-            <button class="save-button" onclick="saveSettings()">Speichern</button>
+
+            <button class="save-button" onclick="closeSettings()">
+                Einstellungen speichern
+            </button>
         </div>
     </div>
 
@@ -223,7 +251,33 @@
 
         function toggleSettings() {
             const panel = document.getElementById('settingsPanel');
-            panel.classList.toggle('active');
+            const button = document.getElementById('checkButton');
+            const container = document.getElementById('mainContainer');
+            
+            if (!panel.classList.contains('active')) {
+                // Öffnen der Einstellungen
+                button.classList.add('hidden');
+                setTimeout(() => {
+                    panel.classList.add('active');
+                    container.classList.add('settings-open');
+                }, 300);
+            }
+        }
+
+        function closeSettings() {
+            const panel = document.getElementById('settingsPanel');
+            const button = document.getElementById('checkButton');
+            const container = document.getElementById('mainContainer');
+            
+            // Speichern der Einstellungen
+            saveSettings();
+
+            // Schließen mit Animation
+            panel.classList.remove('active');
+            container.classList.remove('settings-open');
+            setTimeout(() => {
+                button.classList.remove('hidden');
+            }, 300);
         }
 
         function toggleEmailSettings() {
@@ -247,7 +301,6 @@
             userData.notificationTime = emailNotifications ? time : null;
 
             localStorage.setItem('userData', JSON.stringify(userData));
-            toggleSettings();
         }
 
         function checkSubstitutions() {
