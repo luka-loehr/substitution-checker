@@ -27,40 +27,56 @@
                            class="input-field w-full px-4 py-2 rounded-lg text-white placeholder-gray-400"
                            placeholder="9b">
                 </div>
-            </div>
 
-            <button id="nextButton"
-                    class="next-button w-full mt-8 bg-white text-blue-600 font-medium py-3 px-4 rounded-lg">
-                Weiter
-            </button>
-        </div>
-
-        <div id="step2" class="hidden animate-fade-in">
-            <h2 class="text-2xl font-bold text-white mb-8 text-center">E-Mail Benachrichtigungen</h2>
-            
-            <div class="space-y-4">
                 <div>
                     <label class="block text-white text-sm font-medium mb-2">Deine E-Mail</label>
                     <input type="email" id="userEmail" 
                            class="input-field w-full px-4 py-2 rounded-lg text-white placeholder-gray-400"
                            placeholder="max@beispiel.de">
                 </div>
-                
-                <div>
-                    <label class="block text-white text-sm font-medium mb-2">Benachrichtigungszeit</label>
-                    <input type="time" id="notificationTime" 
-                           class="input-field w-full px-4 py-2 rounded-lg text-white"
-                           value="19:00">
-                </div>
             </div>
 
-            <button id="finishButton"
+            <button id="registerButton"
                     class="next-button w-full mt-8 bg-white text-blue-600 font-medium py-3 px-4 rounded-lg">
-                Einrichtung abschließen
+                Registrieren
             </button>
+        </div>
+
+        <div id="loginForm" class="mt-6 text-center">
+            <p class="text-white text-sm">Bereits registriert?</p>
+            <button id="showLoginButton" class="text-blue-300 hover:text-blue-200 text-sm mt-2">
+                Hier einloggen
+            </button>
+        </div>
+
+        <!-- Login Modal -->
+        <div id="loginModal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
+            <div class="bg-white rounded-lg p-8 max-w-md w-full mx-4">
+                <h2 class="text-2xl font-bold text-gray-800 mb-6">Login</h2>
+                <div class="space-y-4">
+                    <div>
+                        <label class="block text-gray-700 text-sm font-medium mb-2">E-Mail</label>
+                        <input type="email" id="loginEmail" 
+                               class="w-full px-4 py-2 border rounded-lg">
+                    </div>
+                    <button id="loginButton" 
+                            class="w-full bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700">
+                        Einloggen
+                    </button>
+                    <button id="closeLoginModal" 
+                            class="w-full bg-gray-200 text-gray-800 py-2 rounded-lg hover:bg-gray-300 mt-2">
+                        Abbrechen
+                    </button>
+                </div>
+            </div>
         </div>
     </div>
 
-    <script src="js/setup.js"></script>
+    <!-- Firebase SDK -->
+    <script type="module" src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js"></script>
+    <script type="module" src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js"></script>
+    <script type="module" src="https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js"></script>
+    <script type="module" src="js/firebase-config.js"></script>
+    <script type="module" src="js/setup.js"></script>
 </body>
 </html>
