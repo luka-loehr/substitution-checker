@@ -24,7 +24,8 @@
             width: 100%;
             max-width: 400px;
             position: relative;
-            transition: all 0.3s ease;
+            transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+            min-height: 200px;
         }
 
         .welcome-text {
@@ -51,7 +52,7 @@
             border: none;
             border-radius: 8px;
             cursor: pointer;
-            transition: all 0.3s ease;
+            transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
             margin-bottom: 20px;
         }
 
@@ -74,9 +75,11 @@
 
         .check-button.hidden {
             opacity: 0;
-            transform: translateY(20px);
+            transform: translateY(-20px);
             pointer-events: none;
-            position: absolute;
+            margin: 0;
+            padding: 0;
+            height: 0;
         }
 
         .settings-button {
@@ -101,19 +104,26 @@
         }
 
         .settings-panel {
+            position: relative;
             opacity: 0;
-            transform: translateY(20px);
-            transition: all 0.3s ease;
-            display: none;
+            transform: translateY(-20px);
+            transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+            max-height: 0;
+            overflow: hidden;
+            visibility: hidden;
+            padding: 0 20px;
+            margin: 0;
             background: #f8fafc;
             border-radius: 12px;
-            padding: 20px;
         }
 
         .settings-panel.active {
             opacity: 1;
             transform: translateY(0);
-            display: block;
+            max-height: 600px;
+            visibility: visible;
+            padding: 20px;
+            margin-top: 20px;
         }
 
         .input-group {
@@ -266,9 +276,10 @@
             
             if (!panel.classList.contains('active')) {
                 button.classList.add('hidden');
-                setTimeout(() => {
+                panel.style.display = 'block';
+                requestAnimationFrame(() => {
                     panel.classList.add('active');
-                }, 300);
+                });
             }
         }
 
@@ -290,7 +301,6 @@
 
             localStorage.setItem('userData', JSON.stringify(userData));
             
-            // Update welcome message
             document.getElementById('welcomeMessage').textContent = `Willkommen, ${name}`;
             document.getElementById('userClass').textContent = `Klasse ${className}`;
 
@@ -298,27 +308,26 @@
             const button = document.getElementById('checkButton');
             
             panel.classList.remove('active');
-            setTimeout(() => {
+            
+            panel.addEventListener('transitionend', function handler() {
+                panel.removeEventListener('transitionend', handler);
+                panel.style.display = 'none';
                 button.classList.remove('hidden');
-            }, 300);
+            }, { once: true });
         }
 
         function checkSubstitutions() {
             const button = document.getElementById('checkButton');
             
-            // Loading state
             button.classList.add('loading');
             button.textContent = 'Überprüfe Vertretungen';
             button.disabled = true;
 
-            // Simulate check (replace with actual check later)
             setTimeout(() => {
-                // Success state (example)
                 button.classList.remove('loading');
                 button.classList.add('success');
                 button.textContent = 'Keine Vertretungen für Montag';
 
-                // Reset after 10 seconds
                 setTimeout(() => {
                     button.classList.remove('success');
                     button.textContent = 'Nach Vertretungen suchen';
