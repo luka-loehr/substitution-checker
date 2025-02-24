@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Vertretungsplan Dashboard</title>
     <style>
-        /* Basis-Styles und Reset */
         * {
             margin: 0;
             padding: 0;
@@ -17,39 +16,31 @@
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
             background: linear-gradient(135deg, #3B82F6, #2563EB);
             min-height: 100vh;
-            margin: 0;
-            padding: 10px;
             display: flex;
             align-items: center;
             justify-content: center;
-            overflow: hidden;
-            position: fixed;
-            width: 100%;
-            touch-action: manipulation;
+            padding: 20px;
         }
 
-        /* Container Animationen */
         .container {
             background: white;
-            padding: 20px;
-            border-radius: 20px;
-            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
-            width: calc(100% - 20px);
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            width: 100%;
             max-width: 400px;
             position: relative;
-            transition: all 0.6s cubic-bezier(0.4, 0, 0.2, 1);
-            overflow: hidden;
+            transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
         .container.settings-open {
             transform: scale(1.02);
         }
 
-        /* Welcome Section */
         .welcome-text {
             text-align: center;
-            margin-bottom: 25px;
-            transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+            margin-bottom: 30px;
+            transition: all 0.3s ease;
         }
 
         h1 {
@@ -65,7 +56,6 @@
             font-size: 16px;
         }
 
-        /* Button Styles und Animationen */
         .check-button {
             width: 100%;
             min-height: 54px;
@@ -118,11 +108,11 @@
 
         .check-button.hidden {
             opacity: 0;
-            transform: translateY(-20px) scale(0.95) translateZ(0);
+            transform: translateY(-20px) scale(0.95);
             pointer-events: none;
+            position: absolute;
         }
-/* Settings Button und Panel */
-        .settings-button {
+.settings-button {
             position: absolute;
             top: 20px;
             right: 20px;
@@ -142,41 +132,28 @@
             transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
-        .settings-button:active {
-            background-color: rgba(0, 0, 0, 0.05);
-        }
-
         .settings-button.active svg {
             transform: rotate(180deg);
         }
 
         .settings-panel {
-            position: absolute;
-            left: 0;
-            right: 0;
-            background: #f8fafc;
-            border-radius: 16px;
-            padding: 0;
             opacity: 0;
-            transform: translateY(10px);
+            transform: translateY(20px);
             transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
-            pointer-events: none;
-            z-index: 1;
-            margin: 0 20px;
             max-height: 0;
             overflow: hidden;
+            background: #f8fafc;
+            border-radius: 12px;
+            margin-top: 20px;
         }
 
         .settings-panel.active {
             opacity: 1;
             transform: translateY(0);
-            pointer-events: auto;
-            padding: 20px;
             max-height: 600px;
-            margin-top: 20px;
+            padding: 20px;
         }
 
-        /* Form Elements */
         .input-group {
             margin-bottom: 20px;
         }
@@ -192,13 +169,12 @@
         .input-group input {
             width: 100%;
             min-height: 48px;
-            padding: 12px 16px;
+            padding: 12px;
             border: 2px solid #e2e8f0;
             border-radius: 12px;
             font-size: 16px;
             background: white;
             transition: all 0.3s ease;
-            appearance: none;
         }
 
         .input-group input:focus {
@@ -207,7 +183,6 @@
             box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
         }
 
-        /* Save Button */
         .save-button {
             width: 100%;
             min-height: 48px;
@@ -220,27 +195,16 @@
             font-weight: 500;
             cursor: pointer;
             transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            margin-top: 10px;
         }
 
         .save-button:hover {
             transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(37, 99, 235, 0.2);
         }
 
-        .save-button:active {
-            transform: translateY(0);
-        }
-
-        /* Dividers and Section Titles */
         .settings-divider {
             height: 1px;
             background: #e2e8f0;
             margin: 20px 0;
-        }
-
-        .settings-section {
-            margin-bottom: 20px;
         }
 
         .settings-section-title {
@@ -252,7 +216,6 @@
             font-weight: 600;
         }
 
-        /* Loading Animation */
         @keyframes dots {
             0%, 20% { content: ''; }
             40% { content: '.'; }
@@ -264,64 +227,93 @@
             content: '';
             animation: dots 1.5s steps(5, end) infinite;
         }
-
-        /* Mobile Optimizations */
-        @media (max-width: 768px) {
-            body {
-                padding: 10px;
-            }
-
-            .container {
-                margin: 0;
-                width: 100%;
-            }
-
-            .settings-panel.active {
-                margin: 15px;
-            }
-
-            .input-group input {
-                font-size: 16px;
-            }
-        }
     </style>
 </head>
 <body>
-    <!-- Rest des HTML-Codes bleibt gleich -->
-    <script>
-        // Device Detection
-        const isMobile = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
-        if (isMobile) document.body.classList.add('mobile');
+    <div class="container" id="mainContainer">
+        <button class="settings-button" onclick="toggleSettings()">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/>
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+            </svg>
+        </button>
 
-        // Smooth Touch Effects
-        function addTouchEffects() {
-            const buttons = document.querySelectorAll('button');
-            buttons.forEach(button => {
-                button.addEventListener('touchstart', function(e) {
-                    this.style.transform = 'scale(0.98) translateZ(0)';
-                }, { passive: true });
-                
-                button.addEventListener('touchend', function(e) {
-                    this.style.transform = 'scale(1) translateZ(0)';
-                }, { passive: true });
-            });
+        <div class="welcome-text">
+            <h1 id="welcomeMessage">Willkommen</h1>
+            <p id="userClass" class="class-text"></p>
+        </div>
+
+        <button id="checkButton" class="check-button" onclick="checkSubstitutions()">
+            Nach Vertretungen suchen
+        </button>
+
+        <div id="settingsPanel" class="settings-panel">
+            <div class="settings-section">
+                <div class="settings-section-title">Persönliche Informationen</div>
+                <div class="input-group">
+                    <label for="nameSettings">Name</label>
+                    <input type="text" id="nameSettings">
+                </div>
+                <div class="input-group">
+                    <label for="classSettings">Klasse</label>
+                    <input type="text" id="classSettings">
+                </div>
+            </div>
+
+            <div class="settings-divider"></div>
+
+            <div class="settings-section">
+                <div class="settings-section-title">Benachrichtigungen</div>
+                <div class="input-group">
+                    <label for="emailSetting">E-Mail (optional)</label>
+                    <input type="email" id="emailSetting" placeholder="Für Benachrichtigungen">
+                </div>
+                <div class="input-group">
+                    <label for="timeSetting">Benachrichtigungszeit</label>
+                    <input type="time" id="timeSetting" value="19:00">
+                </div>
+            </div>
+
+            <button class="save-button" onclick="closeSettings()">
+                Speichern
+            </button>
+        </div>
+    </div>
+
+    <script>
+        // Vibration Helper Function
+        function vibrate(pattern) {
+            if (navigator.vibrate) {
+                navigator.vibrate(pattern);
+            }
         }
 
-        // Enhanced Settings Toggle
+        // Check if user exists
+        const userData = JSON.parse(localStorage.getItem('userData'));
+        if (!userData) {
+            window.location.href = 'index.html';
+        }
+
+        // Update welcome message
+        document.getElementById('welcomeMessage').textContent = `Willkommen, ${userData.name}`;
+        document.getElementById('userClass').textContent = `Klasse ${userData.class}`;
+
+        // Initialize settings
+        document.getElementById('nameSettings').value = userData.name || '';
+        document.getElementById('classSettings').value = userData.class || '';
+        document.getElementById('emailSetting').value = userData.email || '';
+        document.getElementById('timeSetting').value = userData.notificationTime || '19:00';
+
         function toggleSettings() {
+            vibrate(50); // Kurze Vibration beim Öffnen
             const panel = document.getElementById('settingsPanel');
             const button = document.getElementById('checkButton');
-            const container = document.getElementById('mainContainer');
-            const settingsButton = document.querySelector('.settings-button');
+            const settingsBtn = document.querySelector('.settings-button');
             
             if (!panel.classList.contains('active')) {
                 button.classList.add('hidden');
-                container.classList.add('settings-open');
-                settingsButton.classList.add('active');
-                
-                requestAnimationFrame(() => {
-                    panel.classList.add('active');
-                });
+                panel.classList.add('active');
+                settingsBtn.classList.add('active');
             }
         }
 
@@ -332,50 +324,57 @@
             const time = document.getElementById('timeSetting').value;
 
             if (!name || !className) {
-                if (isMobile) {
-                    // Vibration feedback on error for mobile
-                    if (navigator.vibrate) navigator.vibrate(100);
-                }
+                vibrate([100, 50, 100]); // Error Vibration
                 alert('Name und Klasse sind erforderlich.');
                 return;
             }
 
-            // Save data
             userData.name = name;
             userData.class = className;
             userData.email = email || null;
             userData.notificationTime = email ? time : null;
-            localStorage.setItem('userData', JSON.stringify(userData));
 
-            // Update UI
+            localStorage.setItem('userData', JSON.stringify(userData));
+            
             document.getElementById('welcomeMessage').textContent = `Willkommen, ${name}`;
             document.getElementById('userClass').textContent = `Klasse ${className}`;
 
-            // Animate closing
+            vibrate([50, 30, 50]); // Success Vibration
+
             const panel = document.getElementById('settingsPanel');
             const button = document.getElementById('checkButton');
-            const container = document.getElementById('mainContainer');
-            const settingsButton = document.querySelector('.settings-button');
-
+            const settingsBtn = document.querySelector('.settings-button');
+            
             panel.classList.remove('active');
-            container.classList.remove('settings-open');
-            settingsButton.classList.remove('active');
-
-            setTimeout(() => {
-                button.classList.remove('hidden');
-            }, 300);
+            settingsBtn.classList.remove('active');
+            setTimeout(() => button.classList.remove('hidden'), 300);
         }
 
-        // Initialize
-        document.addEventListener('DOMContentLoaded', function() {
-            addTouchEffects();
+        function checkSubstitutions() {
+            const button = document.getElementById('checkButton');
+            vibrate(30); // Feedback beim Klick
             
-            // Prevent bouncing on iOS
-            document.body.addEventListener('touchmove', function(e) {
-                if (!e.target.closest('.settings-panel')) {
-                    e.preventDefault();
-                }
-            }, { passive: false });
+            button.classList.add('loading');
+            button.textContent = 'Überprüfe Vertretungen';
+            button.disabled = true;
+
+            setTimeout(() => {
+                button.classList.remove('loading');
+                button.classList.add('success');
+                button.textContent = 'Keine Vertretungen für Montag';
+                vibrate([50, 100, 50]); // Erfolgs-Vibration
+
+                setTimeout(() => {
+                    button.classList.remove('success');
+                    button.textContent = 'Nach Vertretungen suchen';
+                    button.disabled = false;
+                }, 10000);
+            }, 2000);
+        }
+
+        // Add touch feedback to all buttons
+        document.querySelectorAll('button').forEach(button => {
+            button.addEventListener('touchstart', () => vibrate(20), { passive: true });
         });
     </script>
 </body>
