@@ -25,11 +25,6 @@
             max-width: 400px;
             position: relative;
             transition: all 0.3s ease;
-            min-height: 200px;
-        }
-
-        .container.settings-open {
-            min-height: 400px;
         }
 
         .welcome-text {
@@ -81,6 +76,7 @@
             opacity: 0;
             transform: translateY(20px);
             pointer-events: none;
+            position: absolute;
         }
 
         .settings-button {
@@ -109,6 +105,9 @@
             transform: translateY(20px);
             transition: all 0.3s ease;
             display: none;
+            background: #f8fafc;
+            border-radius: 12px;
+            padding: 20px;
         }
 
         .settings-panel.active {
@@ -117,42 +116,32 @@
             display: block;
         }
 
-        .checkbox-group {
-            margin-bottom: 15px;
-            display: flex;
-            align-items: center;
-        }
-
-        .checkbox-group input[type="checkbox"] {
-            margin-right: 10px;
-        }
-
-        .email-settings {
-            max-height: 0;
-            overflow: hidden;
-            transition: max-height 0.3s ease-out;
-        }
-
-        .email-settings.active {
-            max-height: 200px;
-        }
-
         .input-group {
-            margin-bottom: 15px;
+            margin-bottom: 20px;
         }
 
         .input-group label {
             display: block;
-            margin-bottom: 5px;
+            margin-bottom: 8px;
             color: #4B5563;
+            font-size: 14px;
         }
 
         .input-group input {
             width: 100%;
-            padding: 8px;
-            border: 1px solid #D1D5DB;
-            border-radius: 6px;
+            padding: 10px;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            font-size: 16px;
+            background: white;
+            transition: border-color 0.2s ease;
             box-sizing: border-box;
+        }
+
+        .input-group input:focus {
+            outline: none;
+            border-color: #3B82F6;
+            box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.1);
         }
 
         .save-button {
@@ -163,7 +152,6 @@
             border: none;
             border-radius: 8px;
             cursor: pointer;
-            margin-top: 20px;
             font-size: 16px;
             transition: transform 0.2s ease, box-shadow 0.2s ease;
         }
@@ -183,6 +171,24 @@
         .loading::after {
             content: '';
             animation: dots 1.5s steps(5, end) infinite;
+        }
+
+        .settings-divider {
+            height: 1px;
+            background: #e2e8f0;
+            margin: 20px 0;
+        }
+
+        .settings-section {
+            margin-bottom: 20px;
+        }
+
+        .settings-section-title {
+            color: #6B7280;
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 15px;
         }
     </style>
 </head>
@@ -205,26 +211,34 @@
         </button>
 
         <div id="settingsPanel" class="settings-panel">
-            <h2 style="margin-bottom: 20px; color: #1F2937;">Einstellungen</h2>
-            
-            <div class="checkbox-group">
-                <input type="checkbox" id="emailNotifications" onchange="toggleEmailSettings()">
-                <label for="emailNotifications">Benachrichtige mich per E-Mail</label>
+            <div class="settings-section">
+                <div class="settings-section-title">Persönliche Informationen</div>
+                <div class="input-group">
+                    <label for="nameSettings">Name</label>
+                    <input type="text" id="nameSettings">
+                </div>
+                <div class="input-group">
+                    <label for="classSettings">Klasse</label>
+                    <input type="text" id="classSettings">
+                </div>
             </div>
 
-            <div id="emailSettings" class="email-settings">
+            <div class="settings-divider"></div>
+
+            <div class="settings-section">
+                <div class="settings-section-title">Benachrichtigungen</div>
                 <div class="input-group">
-                    <label for="emailSetting">E-Mail</label>
-                    <input type="email" id="emailSetting">
+                    <label for="emailSetting">E-Mail (optional)</label>
+                    <input type="email" id="emailSetting" placeholder="Für Benachrichtigungen">
                 </div>
                 <div class="input-group">
                     <label for="timeSetting">Benachrichtigungszeit</label>
-                    <input type="time" id="timeSetting">
+                    <input type="time" id="timeSetting" value="19:00">
                 </div>
             </div>
 
             <button class="save-button" onclick="closeSettings()">
-                Einstellungen speichern
+                Speichern
             </button>
         </div>
     </div>
@@ -241,66 +255,52 @@
         document.getElementById('userClass').textContent = `Klasse ${userData.class}`;
 
         // Initialize settings
-        const emailCheckbox = document.getElementById('emailNotifications');
-        emailCheckbox.checked = userData.emailNotifications || false;
-        if (userData.emailNotifications) {
-            document.getElementById('emailSettings').classList.add('active');
-            document.getElementById('emailSetting').value = userData.email;
-            document.getElementById('timeSetting').value = userData.notificationTime;
-        }
+        document.getElementById('nameSettings').value = userData.name || '';
+        document.getElementById('classSettings').value = userData.class || '';
+        document.getElementById('emailSetting').value = userData.email || '';
+        document.getElementById('timeSetting').value = userData.notificationTime || '19:00';
 
         function toggleSettings() {
             const panel = document.getElementById('settingsPanel');
             const button = document.getElementById('checkButton');
-            const container = document.getElementById('mainContainer');
             
             if (!panel.classList.contains('active')) {
-                // Öffnen der Einstellungen
                 button.classList.add('hidden');
                 setTimeout(() => {
                     panel.classList.add('active');
-                    container.classList.add('settings-open');
                 }, 300);
             }
         }
 
         function closeSettings() {
-            const panel = document.getElementById('settingsPanel');
-            const button = document.getElementById('checkButton');
-            const container = document.getElementById('mainContainer');
-            
-            // Speichern der Einstellungen
-            saveSettings();
-
-            // Schließen mit Animation
-            panel.classList.remove('active');
-            container.classList.remove('settings-open');
-            setTimeout(() => {
-                button.classList.remove('hidden');
-            }, 300);
-        }
-
-        function toggleEmailSettings() {
-            const emailSettings = document.getElementById('emailSettings');
-            const checkbox = document.getElementById('emailNotifications');
-            emailSettings.classList.toggle('active', checkbox.checked);
-        }
-
-        function saveSettings() {
-            const emailNotifications = document.getElementById('emailNotifications').checked;
-            const email = document.getElementById('emailSetting').value;
+            const name = document.getElementById('nameSettings').value.trim();
+            const className = document.getElementById('classSettings').value.trim();
+            const email = document.getElementById('emailSetting').value.trim();
             const time = document.getElementById('timeSetting').value;
 
-            if (emailNotifications && !email) {
-                alert('Bitte gib deine E-Mail-Adresse ein.');
+            if (!name || !className) {
+                alert('Name und Klasse sind erforderlich.');
                 return;
             }
 
-            userData.emailNotifications = emailNotifications;
-            userData.email = emailNotifications ? email : null;
-            userData.notificationTime = emailNotifications ? time : null;
+            userData.name = name;
+            userData.class = className;
+            userData.email = email || null;
+            userData.notificationTime = email ? time : null;
 
             localStorage.setItem('userData', JSON.stringify(userData));
+            
+            // Update welcome message
+            document.getElementById('welcomeMessage').textContent = `Willkommen, ${name}`;
+            document.getElementById('userClass').textContent = `Klasse ${className}`;
+
+            const panel = document.getElementById('settingsPanel');
+            const button = document.getElementById('checkButton');
+            
+            panel.classList.remove('active');
+            setTimeout(() => {
+                button.classList.remove('hidden');
+            }, 300);
         }
 
         function checkSubstitutions() {
